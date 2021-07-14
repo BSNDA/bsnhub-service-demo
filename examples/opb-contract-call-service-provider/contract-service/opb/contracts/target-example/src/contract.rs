@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    to_binary, Deps, DepsMut, Env, HandleResponse, InitResponse, MessageInfo,Binary,StdResult
+    to_binary, attr, Deps, DepsMut, Env, HandleResponse, InitResponse, MessageInfo,Binary,StdResult
 };
 
 use crate::error::ContractError;
@@ -38,7 +38,7 @@ pub fn try_hello(_deps: DepsMut, words: String) -> Result<HandleResponse, Contra
     Ok(HandleResponse {
         messages: vec![],
         data: Some(Binary::from(words.as_bytes())),
-        attributes: vec![],
+        attributes: vec![attr("result", words)],
     })
 }
 
