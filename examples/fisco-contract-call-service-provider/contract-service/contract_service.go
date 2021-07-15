@@ -103,6 +103,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		mysql.TxErrCollection(reqID, err.Error())
 		res.Code = 500
 		res.Message = err.Error()
+		return
 	}
 
 	receipt, err := cs.FISCOClient.WaitForReceipt(tx, "CallService")
@@ -110,6 +111,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		mysql.TxErrCollection(reqID, err.Error())
 		res.Code = 500
 		res.Message = err.Error()
+		return
 	}
 	txHash = receipt.TransactionHash
 	for _, log := range receipt.Logs {
