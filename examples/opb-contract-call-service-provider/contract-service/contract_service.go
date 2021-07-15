@@ -1,7 +1,6 @@
 package contract_service
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/contract-service/opb"
@@ -43,7 +42,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 	}
 
 	var txHash string
-	var callResult []byte
+	var callResult string
 
 	defer func() {
 		resBz, _ := json.Marshal(res)
@@ -51,7 +50,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 
 		if res.Code == 200 {
 			var outputBz []byte
-			outputBz, _ = json.Marshal(types.Output{Result: hex.EncodeToString(callResult)})
+			outputBz, _ = json.Marshal(types.Output{Result: callResult})
 			output = fmt.Sprintf(`{"header":{},"body":%s}`, outputBz)
 		}
 
@@ -96,6 +95,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		mysql.TxErrCollection(reqID, err.Error())
 		res.Code = 500
 		res.Message = err.Error()
+		return
 	}
 	txHash = resultTx.Hash
 
@@ -104,8 +104,9 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		mysql.TxErrCollection(reqID, err.Error())
 		res.Code = 500
 		res.Message = err.Error()
+		return
 	}
-	callResult = resultTx.Data
+	callResult = resultTx.Events[2].Attributes[2].Value
 
 	mysql.OnContractTxSend(reqID, txHash)
 

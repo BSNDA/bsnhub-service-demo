@@ -71,6 +71,7 @@ func NewServiceClientWrapper(
 		Mode:     defaultBroadcastMode,
 		Algo:     defaultKeyAlgorithm,
 		KeyDAO:   store.NewFileDAO(keyPath),
+		Timeout:  5,
 	}
 
 	wrapper := ServiceClientWrapper{
