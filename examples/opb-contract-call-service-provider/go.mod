@@ -2,7 +2,7 @@ module github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-servi
 
 require (
 	github.com/OneOfOne/xxhash v1.2.5 // indirect
-	github.com/bianjieai/irita-sdk-go v1.1.1-0.20210707070124-79ed0124b3de
+	github.com/bianjieai/irita-sdk-go v1.1.1-0.20210719021820-6734d59e4c56
 	github.com/cockroachdb/pebble v0.0.0-20210406003833-3d4c32f510a8
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-sql-driver/mysql v1.4.0
@@ -12,7 +12,6 @@ require (
 )
 
 replace (
-	github.com/bianjieai/irita-sdk-go => /Users/bianjie/irita/irita-sdk-go
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 	github.com/tendermint/tendermint => github.com/bianjieai/tendermint v0.34.1-irita-210113
 )
