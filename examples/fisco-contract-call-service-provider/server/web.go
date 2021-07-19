@@ -47,6 +47,7 @@ func (srv *HTTPService) createRouter() {
 	{
 		fiscobcos.POST("/chains", srv.AddChain)
 		fiscobcos.GET("/chains", srv.GetChains)
+		fiscobcos.POST("/update/:chainid", srv.UpdateChain)
 		fiscobcos.POST("/delete/:chainid", srv.DeleteChain)
 	}
 
@@ -89,6 +90,32 @@ func (srv *HTTPService) AddChain(c *gin.Context) {
 	}
 
 	chainID, err := srv.ChainManager.AddChain(bodyBytes)
+	if err != nil {
+		onError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	onSuccess(c, AddChainResult{ChainID: chainID})
+}
+
+func (srv *HTTPService) UpdateChain(c *gin.Context) {
+
+	var bodyBytes []byte
+	bodyBytes, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		common.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, "invalid JSON payload")
+		return
+	}
+
+	chainID := c.Param("chainid")
+	if err := srv.ChainManager.DeleteChain(chainID); err != nil {
+		onError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+
+	chainID, err = srv.ChainManager.AddChain(bodyBytes)
 	if err != nil {
 		onError(c, http.StatusInternalServerError, err.Error())
 		return
