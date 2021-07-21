@@ -260,9 +260,14 @@ func (f *FabricChainHandler) Callback(reqCtxID, reqID, input string) (output str
 	}
 
 	var res *entity.FabricRespone
-	args := []string{"callService", crossData.Header.ReqSequence, inputData.Dest.EndpointAddress, string(inputData.CallData), inputData.Dest.SubChainID}
 
-	res, err = fabricChain.Invoke(chainInfo.TargetChaincodeName, args)
+	args := []string{"callService", crossData.Header.ReqSequence, inputData.Dest.EndpointAddress, string(inputData.CallData), ""}
+
+	if inputData.Dest.EndpointType == "contract_query" {
+		res, err = fabricChain.Query(chainInfo.TargetChaincodeName, args)
+	}else{
+		res, err = fabricChain.Invoke(chainInfo.TargetChaincodeName, args)
+	}
 
 	InsectCrossInfo := entity.CrossChainInfo{
 		Ic_request_id:  reqID,

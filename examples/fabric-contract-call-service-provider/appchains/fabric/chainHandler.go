@@ -260,9 +260,14 @@ func (f *FabricChainHandler) Callback(reqCtxID, reqID, input string) (output str
 	}
 
 	var res *entity.FabricRespone
-	args := []string{"callService", crossData.Header.ReqSequence, inputData.Dest.EndpointAddress, string(inputData.CallData), inputData.Dest.SubChainID}
 
-	res, err = fabricChain.Invoke(chainInfo.TargetChaincodeName, args)
+	args := []string{"callService", crossData.Header.ReqSequence, inputData.Dest.EndpointAddress, string(inputData.CallData), ""}
+
+	if inputData.Dest.EndpointType == "contract_query" {
+		res, err = fabricChain.Query(chainInfo.TargetChaincodeName, args)
+	}else{
+		res, err = fabricChain.Invoke(chainInfo.TargetChaincodeName, args)
+	}
 
 	InsectCrossInfo := entity.CrossChainInfo{
 		Ic_request_id:  reqID,
@@ -284,7 +289,7 @@ func (f *FabricChainHandler) Callback(reqCtxID, reqID, input string) (output str
 		InsectCrossInfo.Error = err.Error()
 		store.TargetChainInfo(&InsectCrossInfo)
 		//如果处理失败如何返回信息
-		return entity.GetErrOutPut(), types.NewResult(types.Status_Error, fmt.Sprintf("call chain %s has error : %s",chainId, err.Error()))
+		return entity.GetErrOutPut(), types.NewResult(types.Status_Error, fmt.Sprintf("call chain %s has error : %s", chainId, err.Error()))
 	}
 
 	InsectCrossInfo.To_tx = res.TxId
