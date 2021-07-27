@@ -16,7 +16,7 @@ type Body struct {
 	Source `json:"source"`
 	Dest   `json:"dest"`
 	Method string `json:"method"`
-	CallData   []byte `json:"args"`
+	CallData   []byte `json:"calldata"`
 }
 
 type Source struct {

@@ -74,6 +74,7 @@ contract targetCoreEx {
                 _RequestID,
                 result
             );
+            requests[_RequestID] = true;
         }
     }
 }
