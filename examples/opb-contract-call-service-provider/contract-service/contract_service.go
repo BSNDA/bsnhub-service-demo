@@ -106,7 +106,20 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		res.Message = err.Error()
 		return
 	}
-	callResult = resultTx.Events[2].Attributes[2].Value
+
+	for _, e := range resultTx.Events {
+		if e.Type == "wasm" && len(e.Attributes) > 1 {
+			for _, attr := range e.Attributes {
+				if attr.Key == "contract_address" && attr.Value == request.Dest.EndpointAddress {
+					for _, attr = range e.Attributes {
+						if attr.Key == "result" {
+							callResult = attr.Value
+						}
+					}
+				}
+			}
+		}
+	}
 
 	mysql.OnContractTxSend(reqID, txHash)
 
