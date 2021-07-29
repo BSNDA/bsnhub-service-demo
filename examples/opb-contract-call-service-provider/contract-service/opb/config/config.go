@@ -20,6 +20,7 @@ const (
 	Passphrase   = "passphrase"
 	RpcAddrsMap  = "rpc_addrs"
 	GrpcAddrsMap = "grpc_addrs"
+	DefaultFee   = "default_fee"
 	Timeout      = "timeout"
 )
 
@@ -31,6 +32,7 @@ type BaseConfig struct {
 	RpcAddrsMap  map[string]string
 	GrpcAddrsMap map[string]string
 	ChainId      string
+	DefaultFee   string
 	Timeout      uint
 }
 
@@ -56,6 +58,7 @@ func NewBaseConfig(v *viper.Viper) (*BaseConfig, error) {
 	config.Passphrase = v.GetString(common.GetConfigKey(Prefix, Passphrase))
 	config.RpcAddrsMap = v.GetStringMapString(common.GetConfigKey(Prefix, RpcAddrsMap))
 	config.GrpcAddrsMap = v.GetStringMapString(common.GetConfigKey(Prefix, GrpcAddrsMap))
+	config.DefaultFee = v.GetString(common.GetConfigKey(Prefix, DefaultFee))
 	config.Timeout = v.GetUint(common.GetConfigKey(Prefix, Timeout))
 
 	return config, nil

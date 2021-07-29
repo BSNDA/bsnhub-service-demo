@@ -60,10 +60,11 @@ func (f *OpbChain) InstantiateClient(
 	if ok {
 		grpcAddr = grpcAddrstr
 	}
-
+	fees, _ := sdktypes.ParseDecCoins(config.DefaultFee)
 	options := []sdktypes.Option{
 		sdktypes.CachedOption(true),
 		sdktypes.KeyDAOOption(sdkstore.NewFileDAO(config.KeyPath)),
+		sdktypes.FeeOption(fees),
 	}
 
 	clientConfig, err := sdktypes.NewClientConfig(rpcAddr, grpcAddr, config.BaseConfig.ChainId, options...)
