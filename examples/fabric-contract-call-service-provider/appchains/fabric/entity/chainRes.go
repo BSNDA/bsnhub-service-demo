@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"bsn-irita-fabric-provider/appchains/fabric/metadata"
 	"bsn-irita-fabric-provider/common"
 	"encoding/hex"
 	"encoding/json"
@@ -29,14 +30,14 @@ type FabricRespone struct {
 }
 
 type OutPut struct {
-	Header interface{}   `json:"header"`
+	Header metadata.Header  `json:"header"`
 	Body   FabricRespone `json:"body"`
 }
 
-func GetErrOutPut() string {
+func GetErrOutPut(header metadata.Header) string {
 
 	outPut := &OutPut{
-		Header: struct{}{},
+		Header: header,
 		Body:   FabricRespone{},
 	}
 
@@ -45,9 +46,9 @@ func GetErrOutPut() string {
 	return string(jsonBytes)
 }
 
-func GetSuccessOutPut(res FabricRespone) string {
+func GetSuccessOutPut(header metadata.Header, res FabricRespone) string {
 	outPut := &OutPut{
-		Header: struct{}{},
+		Header: header,
 		Body:   res,
 	}
 	jsonBytes, _ := json.Marshal(outPut)
