@@ -46,6 +46,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 
 	var txHash string
 	var callResult []byte
+	var reqHeader types.Header
 
 	defer func() {
 		resBz, _ := json.Marshal(res)
@@ -53,8 +54,10 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 
 		if res.Code == 200 {
 			var outputBz []byte
+			var headerBz []byte
+			headerBz, _ = json.Marshal(reqHeader)
 			outputBz, _ = json.Marshal(types.Output{Result: hex.EncodeToString(callResult)})
-			output = fmt.Sprintf(`{"header":{},"body":%s}`, outputBz)
+			output = fmt.Sprintf(`{"header":%s,"body":%s}`, headerBz, outputBz)
 		}
 
 		cs.Logger.Infof("request processed, result: %s, output: %s", result, output)
@@ -68,6 +71,9 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		res.Message = fmt.Sprintf("can not parse request [%s] input json string : %s", reqID, err.Error())
 		return
 	}
+
+	reqHeader = request.Header
+
 	contractAddress := ethcmn.HexToAddress(request.Dest.EndpointAddress)
 	requestID, err := hex.DecodeString(request.Header.ReqSequence)
 	if err != nil {
