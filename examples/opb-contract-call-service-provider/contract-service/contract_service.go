@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/contract-service/opb"
+	"strconv"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -17,8 +18,8 @@ import (
 
 // ContractService defines the contract service
 type ContractService struct {
-	opbClient   *opb.OpbChain
-	Logger      *log.Logger
+	opbClient *opb.OpbChain
+	Logger    *log.Logger
 }
 
 // BuildContractService builds a ContractService instance from the given config
@@ -71,7 +72,8 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 
 	reqHeader = request.Header
 
-	chainParams, err := cs.opbClient.ChainManager.GetChainParams(request.Dest.ID)
+	id, _ := strconv.ParseInt(request.Dest.ChainID, 10, 64)
+	chainParams, err := cs.opbClient.ChainManager.GetChainParams(types.GetChainID(id))
 	if err != nil {
 		res.Code = 204
 		res.Message = "chain params not exist"
