@@ -88,6 +88,7 @@ func (srv *HTTPService) AddChain(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "invalid JSON payload")
 		return
 	}
+	common.Logger.Infof("AddChain Data Is : %s", string(bodyBytes))
 
 	chainID, err := srv.ChainManager.AddChain(bodyBytes)
 	if err != nil {
@@ -114,6 +115,7 @@ func (srv *HTTPService) UpdateChain(c *gin.Context) {
 		return
 	}
 
+	common.Logger.Infof("UpdateChain Data Is : %s", string(bodyBytes))
 
 	chainID, err = srv.ChainManager.AddChain(bodyBytes)
 	if err != nil {

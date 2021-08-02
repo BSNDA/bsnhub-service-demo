@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -85,7 +86,8 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 	var requestIDByte32 [32]byte
 	copy(requestIDByte32[:], requestID)
 
-	chainParams, err := cs.FISCOClient.ChainManager.GetChainParams(request.Dest.ID)
+	id, _ := strconv.ParseInt(request.Dest.ChainID, 10, 64)
+	chainParams, err := cs.FISCOClient.ChainManager.GetChainParams(types.GetChainID(id))
 	if err != nil {
 		res.Code = 204
 		res.Message = "chain params not exist"
@@ -103,6 +105,9 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 
 		return
 	}
+
+	cs.Logger.Infof("callData:%s", hex.EncodeToString(request.CallData))
+	cs.Logger.Infof("contractAddress:%s", contractAddress)
 
 	tx, _, err := cs.FISCOClient.TargetCoreSession.CallService(requestIDByte32, contractAddress, request.CallData)
 	if err != nil {

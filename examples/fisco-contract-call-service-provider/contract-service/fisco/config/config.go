@@ -17,25 +17,25 @@ import (
 const (
 	Prefix = "fisco"
 
-	ChainId          = "chainId"
-	ConnectionType   = "connection_type"
-	CAFile           = "ca_file"
-	CertFile         = "cert_file"
-	KeyFile          = "key_file"
-	SMCrypto         = "sm_crypto"
-	PrivateKeyFile   = "priv_key_file"
+	ChainId        = "chainId"
+	ConnectionType = "connection_type"
+	CAFile         = "ca_file"
+	CertFile       = "cert_file"
+	KeyFile        = "key_file"
+	SMCrypto       = "sm_crypto"
+	PrivateKeyFile = "priv_key_file"
 )
 
 // BaseConfig defines the base config
 type BaseConfig struct {
-	IsHTTP           bool
-	ChainId          string
-	CAFile           string
-	KeyFile          string
-	CertFile         string
-	PrivateKey       []byte
-	IsSMCrypto       bool
-	NodesMap         map[string]string
+	IsHTTP     bool
+	ChainId    int64
+	CAFile     string
+	KeyFile    string
+	CertFile   string
+	PrivateKey []byte
+	IsSMCrypto bool
+	NodesMap   map[string]string
 }
 
 // ChainParams defines the params for the specific chain
@@ -60,7 +60,7 @@ func NewBaseConfig(v *viper.Viper) (*BaseConfig, error) {
 	keyFile := v.GetString(common.GetConfigKey(Prefix, KeyFile))
 	smCrypto := v.GetBool(common.GetConfigKey(Prefix, SMCrypto))
 	privKeyFile := v.GetString(common.GetConfigKey(Prefix, PrivateKeyFile))
-	chainId := v.GetString(common.GetConfigKey(Prefix, ChainId))
+	chainId := v.GetInt64(common.GetConfigKey(Prefix, ChainId))
 	config := new(BaseConfig)
 
 	if strings.EqualFold(connType, "rpc") {
@@ -83,6 +83,10 @@ func NewBaseConfig(v *viper.Viper) (*BaseConfig, error) {
 	}
 	if !config.IsSMCrypto && curve != "secp256k1" {
 		return nil, fmt.Errorf("must use secp256k1 private key, but found %s", curve)
+	}
+
+	if chainId == 0 {
+		chainId = 1
 	}
 
 	config.ChainId = chainId
@@ -115,7 +119,7 @@ func BuildClientConfig(config Config) *conf.Config {
 		PrivateKey: config.PrivateKey,
 		IsSMCrypto: config.IsSMCrypto,
 		GroupID:    config.GroupID,
-		ChainID:    config.ChainID,
+		ChainID:    config.BaseConfig.ChainId,
 		NodeURL:    nodeName,
 	}
 }
