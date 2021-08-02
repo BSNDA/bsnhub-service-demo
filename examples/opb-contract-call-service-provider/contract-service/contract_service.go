@@ -81,7 +81,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		return
 	}
 
-	mysql.OnServiceRequestReceived(reqID, request.Dest.ID)
+	mysql.OnServiceRequestReceived(reqID, request.Dest.ChainID)
 
 	// instantiate the opb client with the specified group id and chain id
 	err = cs.opbClient.InstantiateClient(chainParams)
