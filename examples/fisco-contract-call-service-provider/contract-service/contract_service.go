@@ -95,7 +95,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		return
 	}
 
-	mysql.OnServiceRequestReceived(reqID, request.Dest.ID)
+	mysql.OnServiceRequestReceived(reqID, request.Dest.ChainID)
 
 	// instantiate the fisco client with the specified group id and chain id
 	err = cs.FISCOClient.InstantiateClient(chainParams)
