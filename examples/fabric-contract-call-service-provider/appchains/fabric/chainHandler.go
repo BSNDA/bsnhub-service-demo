@@ -105,7 +105,7 @@ func (f *FabricChainHandler) RegisterChain(data []byte) error {
 		return errors.New("invalid JSON")
 	}
 
-	if regData.TargetChaincodeName == ""{
+	if regData.TargetChaincodeName == "" {
 		return errors.New("targetChaincodeName cannot be empty")
 	}
 
@@ -270,7 +270,7 @@ func (f *FabricChainHandler) Callback(reqCtxID, reqID, input string) (output str
 
 	if inputData.Dest.EndpointType == "contract_query" {
 		res, err = fabricChain.Query(chainInfo.TargetChaincodeName, args)
-	}else{
+	} else {
 		res, err = fabricChain.Invoke(chainInfo.TargetChaincodeName, args)
 	}
 
@@ -290,9 +290,14 @@ func (f *FabricChainHandler) Callback(reqCtxID, reqID, input string) (output str
 	if err != nil {
 		f.logger.Errorf("Fabric ChainId %s Chaincode %s has error %v", chainId, inputData.Dest.EndpointAddress, err)
 
-		InsectCrossInfo.Tx_status = 2
-		InsectCrossInfo.Error = err.Error()
-		store.TargetChainInfo(&InsectCrossInfo)
+		//不包含重复交易，再记录
+		if !strings.Contains(err.Error(), "the request has been received") {
+			f.logger.Infof("call fabric error don't has 'the request has been received',record trans")
+			InsectCrossInfo.Tx_status = 2
+			InsectCrossInfo.Error = err.Error()
+			store.TargetChainInfo(&InsectCrossInfo)
+		}
+
 		//如果处理失败如何返回信息
 		return entity.GetErrOutPut(*crossData.Header), types.NewResult(types.Status_Error, fmt.Sprintf("call chain %s has error : %s", chainId, err.Error()))
 	}
