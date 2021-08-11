@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql"
+	txstore "github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql/store"
 	"github.com/spf13/cobra"
 
 	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/app"
@@ -58,8 +59,9 @@ func StartCmd() *cobra.Command {
 			appInstance.SetServiceName(config.GetString(common.ConfigKeyServiceName))
 
 			mysqlConfig := mysql.NewConfig(config)
-			mysql.NewDB(mysqlConfig)
-			defer mysql.Close()
+			txstore.InitMysql(mysqlConfig.DSN())
+			//mysql.NewDB(mysqlConfig)
+			//defer mysql.Close()
 
 			// set test api handle
 			server.SetTestCallBack(contractService.Callback)

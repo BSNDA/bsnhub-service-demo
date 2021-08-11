@@ -3,7 +3,7 @@ package iservice
 import (
 	"encoding/json"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/mysql"
+	txStore "github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/mysql/store"
 	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/types"
 	servicesdk "github.com/bianjieai/irita-sdk-go"
 	"github.com/bianjieai/irita-sdk-go/modules/service"
@@ -121,13 +121,29 @@ func (s ServiceClientWrapper) SubscribeServiceRequest(serviceName string, cb ser
 			)
 		}
 		for _, msg := range msgs {
-			msg := msg.(*service.MsgRespondService)
+			msg , ok := msg.(*service.MsgRespondService)
+
+			data := &txStore.ProviderResInfo{
+				TxStatus: txStore.TxStatus_Success,
+				ErrMsg: "",
+			}
+
+			if ok {
+				data.IcRequestId = msg.RequestId
+			}
+
 			resTx, err := s.IritaClient.BuildAndSend([]sdk.Msg{msg}, baseTx)
 			if err != nil {
-				mysql.TxErrCollection(msg.RequestId, err.Error())
+				data.TxStatus = txStore.TxStatus_Error
+				data.ErrMsg =err.Error()
+				s.IritaClient.Logger().Error("provider respond failed", "errMsg", err.Error())
+				//mysql.TxErrCollection(msg.RequestId, err.Error())
 			}else{
-				mysql.OnInterchainResponseSent(msg.RequestId, resTx.Hash)
+				data.HUBResTxId =  resTx.Hash
+				//mysql.OnInterchainResponseSent(msg.RequestId, resTx.Hash)
 			}
+
+			txStore.ProviderCallBackTransRecord(data)
 		}
 	})
 	return err

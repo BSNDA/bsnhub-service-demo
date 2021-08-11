@@ -4,7 +4,6 @@ import (
 	"bsn-irita-fabric-provider/common"
 	"encoding/json"
 
-	"bsn-irita-fabric-provider/appchains/fabric/entity"
 	txStore "bsn-irita-fabric-provider/appchains/fabric/store"
 	"bsn-irita-fabric-provider/types"
 	servicesdk "github.com/irisnet/service-sdk-go"
@@ -122,47 +121,28 @@ func (s ServiceClientWrapper) SubscribeServiceRequest(serviceName string, cb ser
 		}
 		for _, msg := range msgs {
 
+
 			msg, ok := msg.(*service.MsgRespondService)
+
+			data := &txStore.ProviderResInfo{
+				TxStatus: txStore.TxStatus_Success,
+				ErrMsg: "",
+			}
+			if ok {
+				data.IcRequestId = msg.RequestId
+			}
 
 			// Submit to hub
 			resTx, err := s.ServiceClient.BuildAndSend([]sdk.Msg{msg}, baseTx)
-
 			if err != nil {
-				if ok {
-					// TODO 交易记录 向HUB返回响应信息的交易
-					// error     err.Error() err字段
-					// tx_status    2
-
-					//mysql.TxErrCollection(msg.RequestId, err.Error())
-					data := entity.CrossChainInfo{
-						Tx_status:      2,
-						Error:          err.Error(),
-						Ic_request_id:  msg.RequestId,
-						Source_service: 1,
-					}
-					txStore.RequestHubInfoFail(&data)
-				}
-
+				data.TxStatus = txStore.TxStatus_Error
+				data.ErrMsg =err.Error()
 				s.ServiceClient.Logger().Error("provider respond failed", "errMsg", err.Error())
-
 			} else {
-
-				if ok {
-					// TODO 交易记录 向HUB返回响应信息的交易
-					// hub_res_tx  resTx.Hash
-					// tx_status    1
-					//mysql.OnInterchainResponseSent(msg.RequestId, resTx.Hash)
-					data := entity.CrossChainInfo{
-						Tx_status:      1,
-						Hub_res_tx:     resTx.Hash,
-						Ic_request_id:  msg.RequestId,
-						Source_service: 1,
-					}
-					txStore.RequestHubInfoSucc(&data)
-
-				}
-
+				data.HUBResTxId =  resTx.Hash
 			}
+
+			txStore.ProviderCallBackTransRecord(data)
 
 		}
 	})
