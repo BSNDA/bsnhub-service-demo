@@ -59,7 +59,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			var outputBz []byte
 			var headerBz []byte
 			headerBz, _ = json.Marshal(reqHeader)
-			outputBz, _ = json.Marshal(types.Output{Result: hex.EncodeToString(callResult),TxHash: txHash})
+			outputBz, _ = json.Marshal(types.Output{Result: hex.EncodeToString(callResult), TxHash: txHash})
 			output = fmt.Sprintf(`{"header":%s,"body":%s}`, headerBz, outputBz)
 		}
 
@@ -108,8 +108,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		return
 	}
 
-	cs.Logger.Infof("callData:%s", hex.EncodeToString(request.CallData))
-	cs.Logger.Infof("contractAddress:%s", contractAddress)
+	cs.Logger.Infof("contractAddress:%s,callData:%s", contractAddress, hex.EncodeToString(request.CallData))
 
 	tx, _, err := cs.FISCOClient.TargetCoreSession.CallService(requestIDByte32, contractAddress, request.CallData)
 	if err != nil {
@@ -122,15 +121,14 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			res.Message = err.Error()
 
 			return
-		}else  {
+		} else {
 			cs.Logger.Infof("call fabric error don't has 'the request has been received',record trans")
-			store.InitProviderTransRecord(request.Header.ReqSequence,request.Dest.ChainID,reqID,"",err.Error(),store.TxStatus_Error)
+			store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, "", err.Error(), store.TxStatus_Error)
 			//store.TargetChainInfo(&InsectCrossInfo)
 			res.Code = 500
 			res.Message = err.Error()
 			return
 		}
-
 
 	}
 
@@ -140,14 +138,14 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		cs.Logger.Errorf("FISCO ChainId %s Chaincode %s WaitForReceipt has error %v", request.Dest.ChainID, request.Dest.EndpointAddress, err)
 		//不包含重复交易，再记录
 		if strings.Contains(err.Error(), "duplicated") {
-			cs.Logger.Infof("the request has been received or received invalid transaction ,not record trans")
+			cs.Logger.Infof("the request has been duplicated transaction ,not record trans")
 			res.Code = 204
 			res.Message = err.Error()
 
 			return
-		}else  {
+		} else {
 			cs.Logger.Infof("call fabric error don't has 'the request has been received',record trans")
-			store.InitProviderTransRecord(request.Header.ReqSequence,request.Dest.ChainID,reqID,"",err.Error(),store.TxStatus_Error)
+			store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, "", err.Error(), store.TxStatus_Error)
 			//store.TargetChainInfo(&InsectCrossInfo)
 			res.Code = 500
 			res.Message = err.Error()
@@ -179,6 +177,6 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 	}
 
 	//mysql.OnContractTxSend(reqID, txHash)
-	store.InitProviderTransRecord(request.Header.ReqSequence,request.Dest.ChainID,reqID,txHash,"",store.TxStatus_Unknow)
+	store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, txHash, "", store.TxStatus_Unknow)
 	return output, result
 }

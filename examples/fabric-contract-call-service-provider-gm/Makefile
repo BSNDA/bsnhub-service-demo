@@ -11,5 +11,5 @@ endif
 
 install: go.sum
 	@echo "installing provider..."
-	@go build -mod=readonly -o build/irita-fabric-provider-gm ./cmd
+	@go build -mod=readonly -o $${GOBIN-$${GOPATH-$$HOME/go}/bin}/irita-fabric-provider-gm ./cmd
 

@@ -101,6 +101,8 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		WithArgs("request_id", request.ReqSequence).
 		WithArgs("endpoint_address", request.Dest.EndpointAddress).
 		WithArgs("call_data", base64.StdEncoding.EncodeToString(request.CallData))
+
+
 	resultTx, err := cs.opbClient.OpbClient.WASM.Execute(chainParams.TargetCoreAddr, execAbi, nil, cs.opbClient.BuildBaseTx())
 	if err != nil {
 		//mysql.TxErrCollection(reqID, err.Error())
