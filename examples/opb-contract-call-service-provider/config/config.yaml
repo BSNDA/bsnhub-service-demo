@@ -26,7 +26,8 @@ opb:
   key_path: .keys/iservice
   key_name: node1
   passphrase: 1234567890
-  default_fee: 2000000uirita
+  default_fee: 5000000uirita
+  default_gas: 500000
   monitor_interval: 2 # chain monitoring interval in seconds
 
 # mysql config
