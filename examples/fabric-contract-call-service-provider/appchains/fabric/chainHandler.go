@@ -104,6 +104,11 @@ func (f *FabricChainHandler) RegisterChain(data []byte) error {
 		f.logger.Error("invalid JSON %v", err)
 		return errors.New("invalid JSON")
 	}
+
+	if regData.TargetChaincodeName == "" {
+		return errors.New("targetChaincodeName cannot be empty")
+	}
+
 	//存到数据库
 	sc := regData.ToStoreDate(f.sdkConf.OrgCode)
 	err = store.StoreProviderAppInfo(sc)
@@ -235,15 +240,15 @@ func (f *FabricChainHandler) Callback(reqCtxID, reqID, input string) (output str
 	}
 
 	chainId := inputData.Dest.ChainID
-	chainInfo := new(entity.FabricChainInfo)
+	chainInfo := f.getChainInfo(chainId)
+	if chainInfo == nil {
+		//不处理或者处理失败
+		//如果不存在该chainId 信息，需要能返回不处理的信号，hub不用返回结果
+		return entity.GetErrOutPut(*crossData.Header), types.NewResult(types.Status_Chain_NotExist, "chain not exist")
+	}
+
 	fabricChain, ok := f.appChain[chainId]
 	if !ok {
-		chainInfo = f.getChainInfo(chainId)
-		if chainInfo == nil {
-			//不处理或者处理失败
-			//如果不存在该chainId 信息，需要能返回不处理的信号，hub不用返回结果
-			return entity.GetErrOutPut(*crossData.Header), types.NewResult(types.Status_Chain_NotExist, "chain not exist")
-		}
 
 		fabricChain, err = NewFabricChain(f.sdkConf, chainInfo)
 
@@ -263,37 +268,34 @@ func (f *FabricChainHandler) Callback(reqCtxID, reqID, input string) (output str
 
 	args := []string{"callService", crossData.Header.ReqSequence, inputData.Dest.EndpointAddress, string(inputData.CallData), ""}
 
+	f.logger.Infof("args is %v",args)
+
 	if inputData.Dest.EndpointType == "contract_query" {
 		res, err = fabricChain.Query(chainInfo.TargetChaincodeName, args)
-	}else{
+	} else {
 		res, err = fabricChain.Invoke(chainInfo.TargetChaincodeName, args)
 	}
 
-	InsectCrossInfo := entity.CrossChainInfo{
-		Ic_request_id:  reqID,
-		To_chainid:     chainId,
-		Tx_status:      1,
-		Source_service: 1,
-		Tx_createtime:  time.Now(),
-	}
-
-	//todo 目标链信息 insert
-	// request_id reqID
-	// to_chainid  chainId
-	// to_tx  res.TxId
 
 	if err != nil {
 		f.logger.Errorf("Fabric ChainId %s Chaincode %s has error %v", chainId, inputData.Dest.EndpointAddress, err)
 
-		InsectCrossInfo.Tx_status = 2
-		InsectCrossInfo.Error = err.Error()
-		store.TargetChainInfo(&InsectCrossInfo)
+		//received invalid transaction
+		//不包含重复交易，再记录
+		if strings.Contains(err.Error(), "the request has been received") || strings.Contains(err.Error(), "received invalid transaction") {
+			f.logger.Infof("the request has been received or received invalid transaction ,not record trans")
+			return entity.GetErrOutPut(*crossData.Header), types.NewResult(types.Status_Chain_NotExist, "chain received")
+		}else  {
+			f.logger.Infof("call fabric error don't has 'the request has been received',record trans")
+			store.InitProviderTransRecord(crossData.Header.ReqSequence,chainId,reqID,"",err.Error(),store.TxStatus_Error)
+			//store.TargetChainInfo(&InsectCrossInfo)
+		}
+
 		//如果处理失败如何返回信息
 		return entity.GetErrOutPut(*crossData.Header), types.NewResult(types.Status_Error, fmt.Sprintf("call chain %s has error : %s", chainId, err.Error()))
 	}
 
-	InsectCrossInfo.To_tx = res.TxId
-	store.TargetChainInfo(&InsectCrossInfo)
+	store.InitProviderTransRecord(crossData.Header.ReqSequence,chainId,reqID,res.TxId,"",store.TxStatus_Unknow)
 
 	//resBytes, _ := json.Marshal(res)
 	//f.logger.Infof("call fabric ")
