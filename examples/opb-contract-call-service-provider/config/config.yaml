@@ -22,7 +22,7 @@ opb:
     opb1.bsnbase.com: http://127.0.0.1:26658
   grpc_addrs:
     opb1.bsnbase.com: 127.0.0.1:9091
-  timeout: 10
+  timeout: 20
   key_path: .keys/iservice
   key_name: node1
   passphrase: 1234567890

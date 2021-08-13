@@ -65,6 +65,7 @@ func (f *OpbChain) InstantiateClient(
 		sdktypes.CachedOption(true),
 		sdktypes.KeyDAOOption(sdkstore.NewFileDAO(config.KeyPath)),
 		sdktypes.FeeOption(fees),
+		sdktypes.TimeoutOption(config.Timeout),
 	}
 
 	clientConfig, err := sdktypes.NewClientConfig(rpcAddr, grpcAddr, config.BaseConfig.ChainId, options...)
