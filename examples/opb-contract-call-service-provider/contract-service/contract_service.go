@@ -53,10 +53,11 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 	defer func() {
 		resBz, _ := json.Marshal(res)
 		result = string(resBz)
-		headerBz, _ := json.Marshal(reqHeader)
-		output = fmt.Sprintf(`{"header":%s,"body":{}}`, headerBz)
+
 		if res.Code == 200 {
 			var outputBz []byte
+			var headerBz []byte
+			headerBz, _ = json.Marshal(reqHeader)
 			outputBz, _ = json.Marshal(types.Output{Result: callResult,TxHash: txHash})
 			output = fmt.Sprintf(`{"header":%s,"body":%s}`, headerBz, outputBz)
 		}
