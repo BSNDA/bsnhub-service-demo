@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql/store"
+
 	"strconv"
 	"strings"
 
@@ -14,7 +16,7 @@ import (
 
 	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/contract-service/fisco"
 	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/contract-service/fisco/config"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql"
+	//"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql"
 	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/server"
 	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/types"
 )
@@ -57,7 +59,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			var outputBz []byte
 			var headerBz []byte
 			headerBz, _ = json.Marshal(reqHeader)
-			outputBz, _ = json.Marshal(types.Output{Result: hex.EncodeToString(callResult)})
+			outputBz, _ = json.Marshal(types.Output{Result: hex.EncodeToString(callResult), TxHash: txHash})
 			output = fmt.Sprintf(`{"header":%s,"body":%s}`, headerBz, outputBz)
 		}
 
@@ -95,7 +97,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		return
 	}
 
-	mysql.OnServiceRequestReceived(reqID, request.Dest.ChainID)
+	//mysql.OnServiceRequestReceived(reqID, request.Dest.ChainID)
 
 	// instantiate the fisco client with the specified group id and chain id
 	err = cs.FISCOClient.InstantiateClient(chainParams)
@@ -106,23 +108,50 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		return
 	}
 
-	cs.Logger.Infof("callData:%s", hex.EncodeToString(request.CallData))
-	cs.Logger.Infof("contractAddress:%s", contractAddress)
+	cs.Logger.Infof("contractAddress:%s,callData:%s", contractAddress, hex.EncodeToString(request.CallData))
 
 	tx, _, err := cs.FISCOClient.TargetCoreSession.CallService(requestIDByte32, contractAddress, request.CallData)
 	if err != nil {
-		mysql.TxErrCollection(reqID, err.Error())
-		res.Code = 500
-		res.Message = err.Error()
-		return
+		//mysql.TxErrCollection(reqID, err.Error())
+		cs.Logger.Errorf("FISCO ChainId %s Chaincode %s CallService has error %v", request.Dest.ChainID, request.Dest.EndpointAddress, err)
+		//不包含重复交易，再记录
+		if strings.Contains(err.Error(), "duplicated") {
+			cs.Logger.Infof("the request has been received or received invalid transaction ,not record trans")
+			res.Code = 204
+			res.Message = err.Error()
+
+			return
+		} else {
+			cs.Logger.Infof("call fabric error don't has 'the request has been received',record trans")
+			store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, "", err.Error(), store.TxStatus_Error)
+			//store.TargetChainInfo(&InsectCrossInfo)
+			res.Code = 500
+			res.Message = err.Error()
+			return
+		}
+
 	}
 
 	receipt, err := cs.FISCOClient.WaitForReceipt(tx, "CallService")
 	if err != nil {
-		mysql.TxErrCollection(reqID, err.Error())
-		res.Code = 500
-		res.Message = err.Error()
-		return
+		//mysql.TxErrCollection(reqID, err.Error())
+		cs.Logger.Errorf("FISCO ChainId %s Chaincode %s WaitForReceipt has error %v", request.Dest.ChainID, request.Dest.EndpointAddress, err)
+		//不包含重复交易，再记录
+		if strings.Contains(err.Error(), "duplicated") {
+			cs.Logger.Infof("the request has been duplicated transaction ,not record trans")
+			res.Code = 204
+			res.Message = err.Error()
+
+			return
+		} else {
+			cs.Logger.Infof("call fabric error don't has 'the request has been received',record trans")
+			store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, "", err.Error(), store.TxStatus_Error)
+			//store.TargetChainInfo(&InsectCrossInfo)
+			res.Code = 500
+			res.Message = err.Error()
+			return
+		}
+
 	}
 	txHash = receipt.TransactionHash
 	for _, log := range receipt.Logs {
@@ -147,7 +176,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		break
 	}
 
-	mysql.OnContractTxSend(reqID, txHash)
-
+	//mysql.OnContractTxSend(reqID, txHash)
+	store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, txHash, "", store.TxStatus_Unknow)
 	return output, result
 }
