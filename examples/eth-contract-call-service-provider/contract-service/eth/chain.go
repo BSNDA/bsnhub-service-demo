@@ -37,7 +37,7 @@ func NewEthChain(
 	}
 }
 
-// InstantiateClient instantiates the fisco client according to the given chain params
+// InstantiateClient instantiates the eth client according to the given chain params
 func (ec *EthChain) InstantiateClient(
 	chainParams ethcfg.ChainParams,
 ) error {
@@ -56,8 +56,8 @@ func (ec *EthChain) InstantiateClient(
 
 	client, err := ethclient.Dial(nodeUrl)
 	if err != nil {
-		common.Logger.Errorf("failed to connect to fisco node: %s", err)
-		return fmt.Errorf("failed to connect to fisco node: %s", err)
+		common.Logger.Errorf("failed to connect to eth node: %s", err)
+		return fmt.Errorf("failed to connect to eth node: %s", err)
 	}
 
 	targetCore, err := NewTargetCoreEx(ethcmn.HexToAddress(chainParams.TargetCoreAddr), client)

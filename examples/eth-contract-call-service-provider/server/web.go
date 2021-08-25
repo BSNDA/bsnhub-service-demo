@@ -43,12 +43,12 @@ func (srv *HTTPService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (srv *HTTPService) createRouter() {
 	r := gin.Default()
 	api := r.Group("/api/v0")
-	fiscobcos := api.Group("/fiscobcos")
+	eth := api.Group("/eth")
 	{
-		fiscobcos.POST("/chains", srv.AddChain)
-		fiscobcos.GET("/chains", srv.GetChains)
-		fiscobcos.POST("/update/:chainid", srv.UpdateChain)
-		fiscobcos.POST("/delete/:chainid", srv.DeleteChain)
+		eth.POST("/chains", srv.AddChain)
+		eth.GET("/chains", srv.GetChains)
+		eth.POST("/update/:chainid", srv.UpdateChain)
+		eth.POST("/delete/:chainid", srv.DeleteChain)
 	}
 
 	r.GET("/health", srv.ShowHealth)

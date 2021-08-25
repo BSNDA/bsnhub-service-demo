@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"eth-contract-call-service-provider/contract-service/eth/config"
 	"fmt"
-	"strconv"
 )
 
 type Header struct {
@@ -54,13 +53,8 @@ type Result struct {
 	Message string `json:"message"`
 }
 
-
-func GetChainIDString(chainID int64) string {
-	return strconv.FormatInt(chainID, 10)
-}
-
 func GetChainID(chainID string) string {
-	return fmt.Sprintf("%s-%s", "fisco", chainID)
+	return fmt.Sprintf("%s-%s", "eth", chainID)
 }
 
 // GetChainIDFromBytes returns the unique chain id from the given chain params bytes
