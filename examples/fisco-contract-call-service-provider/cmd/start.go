@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql"
-	txstore "github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql/store"
+	"fisco-contract-call-service-provider/mysql"
+	txstore "fisco-contract-call-service-provider/mysql/store"
 	"github.com/spf13/cobra"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/app"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/common"
-	contractservice "github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/contract-service"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/iservice"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/server"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/store"
+	"fisco-contract-call-service-provider/app"
+	"fisco-contract-call-service-provider/common"
+	contractservice "fisco-contract-call-service-provider/contract-service"
+	"fisco-contract-call-service-provider/iservice"
+	"fisco-contract-call-service-provider/server"
+	"fisco-contract-call-service-provider/store"
 )
 
 const (

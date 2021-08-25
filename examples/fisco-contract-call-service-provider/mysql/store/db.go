@@ -1,8 +1,8 @@
 package store
 
 import (
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/common/mysql"
-	logging "github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/common"
+	"fisco-contract-call-service-provider/common/mysql"
+	logging "fisco-contract-call-service-provider/common"
 )
 
 // init mysql

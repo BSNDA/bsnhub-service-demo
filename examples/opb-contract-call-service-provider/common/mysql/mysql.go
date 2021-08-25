@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	logging "github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common"
+	logging "opb-contract-call-service-provider/common"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"

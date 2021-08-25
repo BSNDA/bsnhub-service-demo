@@ -2,8 +2,8 @@ package iservice
 
 import (
 	"encoding/json"
-	txStore "github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql/store"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/types"
+	txStore "fisco-contract-call-service-provider/mysql/store"
+	"fisco-contract-call-service-provider/types"
 	servicesdk "github.com/irisnet/service-sdk-go"
 	"github.com/irisnet/service-sdk-go/service"
 	sdk "github.com/irisnet/service-sdk-go/types"

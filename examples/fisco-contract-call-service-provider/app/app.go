@@ -5,8 +5,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	contractservice "github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/contract-service"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/iservice"
+	contractservice "fisco-contract-call-service-provider/contract-service"
+	"fisco-contract-call-service-provider/iservice"
 )
 
 // App represents the provider application
