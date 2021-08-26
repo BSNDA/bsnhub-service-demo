@@ -54,6 +54,14 @@ type Result struct {
 	Message string `json:"message"`
 }
 
+// ResponseAdaptor is the wrapped response struct of Irita-Hub
+type ResponseAdaptor struct {
+	StatusCode  int
+	Result      string
+	Output      string
+	ICRequestID string
+}
+
 func GetChainIDString(chainID int64) string {
 	return strconv.FormatInt(chainID, 10)
 }
