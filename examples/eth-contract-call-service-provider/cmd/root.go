@@ -10,7 +10,7 @@ import (
 // rootCmd is the entry point
 var (
 	rootCmd = &cobra.Command{
-		Use:   "eth-contract-call-sp",
+		Use:   "irita-eth-provider",
 		Short: "eth service provider daemon command line interface",
 	}
 )

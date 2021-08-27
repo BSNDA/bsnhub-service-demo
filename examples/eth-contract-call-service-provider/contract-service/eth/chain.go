@@ -65,7 +65,7 @@ func (ec *EthChain) InstantiateClient(
 		common.Logger.Errorf("failed to instantiate the iservice core contract: %s", err)
 	}
 
-	targetCoreABI, err := abi.JSON(strings.NewReader(TargetCoreExMetaData.ABI))
+	targetCoreABI, err := abi.JSON(strings.NewReader(TargetCoreExABI))
 	if err != nil {
 		return fmt.Errorf("failed to parse iService Core Extension ABI: %s", err)
 	}
@@ -86,7 +86,7 @@ func (ec *EthChain) WaitForReceipt(tx *ethtypes.Transaction, name string) (*etht
 		return nil, fmt.Errorf("failed to mint the transaction %s: %s", tx.Hash().Hex(), err)
 	}
 
-	if receipt.Status != ethtypes.ReceiptStatusFailed {
+	if receipt.Status != ethtypes.ReceiptStatusSuccessful {
 		return nil, fmt.Errorf("transaction %s execution failed", tx.Hash().Hex())
 	}
 
@@ -102,7 +102,7 @@ func (ec *EthChain) BuildAuthTransactor() (*bind.TransactOpts, error) {
 		return nil, err
 	}
 
-	auth, err := bind.NewKeyedTransactorWithChainID(privKey, new(big.Int))
+	auth := bind.NewKeyedTransactor(privKey)
 
 	nextNonce, err := ec.Client.PendingNonceAt(context.Background(), auth.From)
 	if err != nil {

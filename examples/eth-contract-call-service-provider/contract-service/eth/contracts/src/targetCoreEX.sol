@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: SimPL-2.0
-pragma solidity ^0.8.7;
+pragma solidity ^0.6.0;
+
 
 /**
  * @title iService Core Extension contract
@@ -40,8 +41,37 @@ contract targetCoreEx {
         address _endpointAddress,
         bytes memory _callData
     ) public validateRequest(_RequestID) {
-        (bool success, bytes memory result) = _endpointAddress.call(_callData);
-        if (success == true) {
+        uint callDataLength = _callData.length;
+        bytes memory result;
+        uint success;
+        assembly {
+        // call
+            let d := add(_callData, 0x20)
+            success := call(
+            gas(),
+            _endpointAddress,
+            callvalue(),
+            d,
+            callDataLength,
+            0,
+            0
+            )
+
+        // handle result
+            switch success
+            case 1 {
+                let size := returndatasize()
+                result := mload(0x40)
+                mstore(0x40, add(result, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+                mstore(result, size)
+                returndatacopy(add(result, 0x20), 0, size)
+            }
+            case 0 {
+            // call failed and revert
+                revert(0, 0)
+            }
+        }
+        if (success == 1) {
             emit CrossChainResponseSent(
                 _RequestID,
                 result

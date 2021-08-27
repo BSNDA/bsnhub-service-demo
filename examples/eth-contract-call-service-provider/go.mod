@@ -2,7 +2,7 @@ module eth-contract-call-service-provider
 
 require (
 	github.com/cockroachdb/pebble v0.0.0-20210406003833-3d4c32f510a8
-	github.com/ethereum/go-ethereum v1.10.9-0.20210824190246-fe2f153b556a
+	github.com/ethereum/go-ethereum v1.9.18
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/irisnet/service-sdk-go v1.0.0

@@ -165,7 +165,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		}
 
 		var event eth.TargetCoreExCrossChainResponseSent
-		err = cs.EthClient.TargetCoreABI.UnpackIntoInterface(&event, cs.EthClient.BaseConfig.IServiceEventName, log.Data)
+		err = cs.EthClient.TargetCoreABI.Unpack(&event, cs.EthClient.BaseConfig.IServiceEventName, log.Data)
 		if err != nil {
 			cs.Logger.Errorf("failed to unpack the log data: %s", err)
 			continue

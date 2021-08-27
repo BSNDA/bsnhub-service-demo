@@ -18,8 +18,8 @@ const (
 	Passphrase      = "passphrase"
 	Nodes           = "nodes"
 
-	TargetEventName  = "iservice_event_name"
-	TargetEventSig   = "iservice_event_sig"
+	TargetEventName  = "target_event_name"
+	TargetEventSig   = "target_event_sig"
 )
 
 // BaseConfig defines the base config

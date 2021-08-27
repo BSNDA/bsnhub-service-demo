@@ -3,7 +3,6 @@ package types
 import (
 	"encoding/json"
 	"eth-contract-call-service-provider/contract-service/eth/config"
-	"fmt"
 )
 
 type Header struct {
@@ -53,10 +52,6 @@ type Result struct {
 	Message string `json:"message"`
 }
 
-func GetChainID(chainID string) string {
-	return fmt.Sprintf("%s-%s", "eth", chainID)
-}
-
 // GetChainIDFromBytes returns the unique chain id from the given chain params bytes
 func GetChainIDFromBytes(params []byte) (string, error) {
 	var chainParams config.ChainParams
@@ -65,5 +60,5 @@ func GetChainIDFromBytes(params []byte) (string, error) {
 		return "", err
 	}
 
-	return GetChainID(chainParams.ChainID), nil
+	return chainParams.ChainID, nil
 }

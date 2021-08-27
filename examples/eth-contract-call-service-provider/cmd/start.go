@@ -21,7 +21,7 @@ func StartCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "start",
 		Short:   "Start provider daemon",
-		Example: `eth-contract-call-sp start [config-file]`,
+		Example: `irita-eth-provider start [config-file]`,
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			configFileName := ""
