@@ -1,7 +1,7 @@
 module fisco-contract-call-service-provider
 
 require (
-	github.com/FISCO-BCOS/go-sdk v0.10.1
+	github.com/FISCO-BCOS/go-sdk v0.11.0
 	github.com/cockroachdb/pebble v0.0.0-20210406003833-3d4c32f510a8
 	github.com/ethereum/go-ethereum v1.9.18
 	github.com/gin-gonic/gin v1.7.1
