@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/iservice"
+	"opb-contract-call-service-provider/common"
+	"opb-contract-call-service-provider/iservice"
 )
 
 var (

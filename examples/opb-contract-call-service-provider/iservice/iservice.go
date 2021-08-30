@@ -3,8 +3,8 @@ package iservice
 import (
 	"encoding/json"
 
-	txStore "github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/mysql/store"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/types"
+	txStore "opb-contract-call-service-provider/mysql/store"
+	"opb-contract-call-service-provider/types"
 	servicesdk "github.com/bianjieai/irita-sdk-go"
 	"github.com/bianjieai/irita-sdk-go/modules/service"
 	sdk "github.com/bianjieai/irita-sdk-go/types"

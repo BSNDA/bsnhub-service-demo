@@ -1,8 +1,8 @@
 package store
 
 import (
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common/mysql"
-	logging "github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common"
+	"opb-contract-call-service-provider/common/mysql"
+	logging "opb-contract-call-service-provider/common"
 )
 
 // init mysql

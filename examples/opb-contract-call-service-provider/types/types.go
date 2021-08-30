@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/contract-service/opb/config"
+	"opb-contract-call-service-provider/contract-service/opb/config"
 	"strconv"
 )
 

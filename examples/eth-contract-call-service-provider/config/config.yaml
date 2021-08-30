@@ -1,0 +1,37 @@
+base:
+  app_chain_type: eth # application chain type
+  store_path: .db # store path
+  http_port: 8083
+
+# iservice config
+iservice:
+  chain_id: irita
+  node_rpc_addr: http://127.0.0.1:26657
+  node_grpc_addr: 127.0.0.1:9090
+  key_path: .keys/iservice
+  key_name: node0
+  passphrase: 1234567890
+
+service:
+  service_name: cc-contract-call
+
+# ethereum config
+eth:
+  chain_id: ropsten
+  gas_limit: 2000000
+  gas_price: 5000000000
+  key: 45760456b8181a0c3a313e8d9031b1f9343b1f45baaf5043262c19b63b163d5f
+  passphrase: wd941014
+  target_event_name: CrossChainResponseSent
+  target_event_sig: CrossChainResponseSent(bytes32,bytes)
+  monitor_interval: 1 # chain monitoring interval in seconds
+  nodes:
+    eth1.bsnbase.com: wss://ropsten.infura.io/ws/v3/56e89587eacb4fbe8655e4c44b146237
+
+# mysql config
+mysql:
+  db_name: relayer
+  db_user_name: root
+  db_user_passphrase: 123456
+  host: localhost
+  port: 3306
