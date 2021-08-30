@@ -1,14 +1,14 @@
 package contract_service
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"context"
 	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/contract-service/opb"
 	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/mysql/store"
-	"github.com/bianjieai/irita-sdk-go/modules/wasm"
 	"github.com/bianjieai/irita-sdk-go/modules/service"
+	"github.com/bianjieai/irita-sdk-go/modules/wasm"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"strconv"
@@ -112,7 +112,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			invokeServiceReq.Providers = []string{request.Dest.EndpointAddress}
 		}
 
-		reqCtxID, _, err := cs.opbClient.OpbClient.Service.InvokeService(invokeServiceReq, cs.opbClient.BuildBaseTx())
+		targetReqCtxID, _, err := cs.opbClient.OpbClient.Service.InvokeService(invokeServiceReq, cs.opbClient.BuildBaseTx())
 		if err != nil {
 			//参数不符合规则，直接不处理
 			res.Code = 500
@@ -120,7 +120,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			return
 		}
 
-		requests, err := cs.opbClient.OpbClient.Service.QueryRequestsByReqCtx(reqCtxID, 1, nil)
+		requests, err := cs.opbClient.OpbClient.Service.QueryRequestsByReqCtx(targetReqCtxID, 1, nil)
 		if err != nil {
 			res.Code = 500
 			res.Message = fmt.Sprintf("query requests by ReqCtx failed: %s", err.Error())
@@ -133,7 +133,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			return
 		}
 		ch := make(chan int)
-		callbackWrapper := func(reqCtxID, requestID, result string, response string) {
+		callbackWrapper := func(targetReqCtxID, requestID, result string, response string) {
 			resp := types.ResponseAdaptor{
 				StatusCode: 200,
 				Result:     result,
@@ -145,7 +145,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		}
 
 		cs.Logger.Infof("waiting for the service response on %s", request.Dest.ChainID)
-		subscription, err := cs.opbClient.OpbClient.Service.SubscribeServiceResponse(reqCtxID, callbackWrapper)
+		subscription, err := cs.opbClient.OpbClient.Service.SubscribeServiceResponse(targetReqCtxID, callbackWrapper)
 		if err != nil {
 			res.Code = 500
 			res.Message = fmt.Sprintf("no service request initiated on %s", request.Dest.ChainID)
@@ -153,10 +153,10 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		}
 		go func() {
 			for {
-				reqCtx, err := cs.opbClient.OpbClient.Service.QueryRequestContext(reqCtxID)
+				targetReqCtx, err := cs.opbClient.OpbClient.Service.QueryRequestContext(targetReqCtxID)
 				status, err2 := cs.opbClient.OpbClient.Status(context.Background())
 				req, err3 := cs.opbClient.OpbClient.Service.QueryServiceRequest(requests[0].ID)
-				if err != nil || err2 != nil || err3 != nil || reqCtx.BatchState == "BATCH_COMPLETED" || status.SyncInfo.LatestBlockHeight > req.ExpirationHeight {
+				if err != nil || err2 != nil || err3 != nil || targetReqCtx.BatchState == "BATCH_COMPLETED" || status.SyncInfo.LatestBlockHeight > req.ExpirationHeight {
 					cs.Logger.Infof("HUB Unsubscribe RequestID is %s", requests[0].ID)
 					res.Code = 500
 					res.Message = fmt.Sprintf("call service timeout")
