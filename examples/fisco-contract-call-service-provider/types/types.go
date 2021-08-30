@@ -2,8 +2,8 @@ package types
 
 import (
 	"encoding/json"
+	"fisco-contract-call-service-provider/contract-service/fisco/config"
 	"fmt"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/contract-service/fisco/config"
 	"strconv"
 )
 

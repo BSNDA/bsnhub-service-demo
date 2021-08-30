@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/mysql"
-	txstore "github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/mysql/store"
+	"opb-contract-call-service-provider/mysql"
+	txstore "opb-contract-call-service-provider/mysql/store"
 	"github.com/spf13/cobra"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/app"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common"
-	contractservice "github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/contract-service"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/iservice"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/server"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/store"
+	"opb-contract-call-service-provider/app"
+	"opb-contract-call-service-provider/common"
+	contractservice "opb-contract-call-service-provider/contract-service"
+	"opb-contract-call-service-provider/iservice"
+	"opb-contract-call-service-provider/server"
+	"opb-contract-call-service-provider/store"
 )
 
 const (

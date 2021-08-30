@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/contract-service/opb"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/mysql/store"
+	"opb-contract-call-service-provider/contract-service/opb"
+	"opb-contract-call-service-provider/mysql/store"
 	"strings"
 
 	"strconv"
@@ -13,10 +13,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/contract-service/opb/config"
+	"opb-contract-call-service-provider/contract-service/opb/config"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/server"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/types"
+	"opb-contract-call-service-provider/server"
+	"opb-contract-call-service-provider/types"
 	"github.com/bianjieai/irita-sdk-go/modules/wasm"
 )
 

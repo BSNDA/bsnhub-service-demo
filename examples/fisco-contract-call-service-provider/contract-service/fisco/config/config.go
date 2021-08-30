@@ -11,7 +11,7 @@ import (
 
 	"github.com/FISCO-BCOS/go-sdk/conf"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/common"
+	"fisco-contract-call-service-provider/common"
 )
 
 const (

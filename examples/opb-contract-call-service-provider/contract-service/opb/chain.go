@@ -2,9 +2,9 @@ package opb
 
 import (
 	"fmt"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common"
-	opbcfg "github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/contract-service/opb/config"
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/server"
+	"opb-contract-call-service-provider/common"
+	opbcfg "opb-contract-call-service-provider/contract-service/opb/config"
+	"opb-contract-call-service-provider/server"
 	sdk "github.com/bianjieai/irita-sdk-go"
 	sdktypes "github.com/bianjieai/irita-sdk-go/types"
 	sdkstore "github.com/bianjieai/irita-sdk-go/types/store"

@@ -1,7 +1,7 @@
-module github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider
+module opb-contract-call-service-provider
 
 require (
-	github.com/OneOfOne/xxhash v1.2.5 // indirect
+	github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider v0.0.0-20210813083055-376cfb8397b9
 	github.com/bianjieai/irita-sdk-go v1.1.1-0.20210719021820-6734d59e4c56
 	github.com/cockroachdb/pebble v0.0.0-20210406003833-3d4c32f510a8
 	github.com/gin-gonic/gin v1.7.1

@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql/store"
+	"fisco-contract-call-service-provider/mysql/store"
 
 	"strconv"
 	"strings"
@@ -14,11 +14,11 @@ import (
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/contract-service/fisco"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/contract-service/fisco/config"
-	//"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/mysql"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/server"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/types"
+	"fisco-contract-call-service-provider/contract-service/fisco"
+	"fisco-contract-call-service-provider/contract-service/fisco/config"
+	//"fisco-contract-call-service-provider/mysql"
+	"fisco-contract-call-service-provider/server"
+	"fisco-contract-call-service-provider/types"
 )
 
 // ContractService defines the contract service

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 
-	cfg "github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common"
+	cfg "opb-contract-call-service-provider/common"
 )
 
 const (

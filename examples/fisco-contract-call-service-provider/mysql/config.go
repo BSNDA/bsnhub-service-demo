@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 
-	cfg "github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/common"
+	cfg "fisco-contract-call-service-provider/common"
 )
 
 const (

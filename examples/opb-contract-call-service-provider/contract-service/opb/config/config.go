@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common"
+	"opb-contract-call-service-provider/common"
 )
 
 const (

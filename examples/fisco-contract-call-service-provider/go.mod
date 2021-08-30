@@ -1,4 +1,4 @@
-module github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider
+module fisco-contract-call-service-provider
 
 require (
 	github.com/FISCO-BCOS/go-sdk v0.11.0

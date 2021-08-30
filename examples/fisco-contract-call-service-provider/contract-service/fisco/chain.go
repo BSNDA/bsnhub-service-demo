@@ -8,9 +8,9 @@ import (
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"strings"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/common"
-	fiscocfg "github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/contract-service/fisco/config"
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/server"
+	"fisco-contract-call-service-provider/common"
+	fiscocfg "fisco-contract-call-service-provider/contract-service/fisco/config"
+	"fisco-contract-call-service-provider/server"
 )
 
 // FISCOChain defines the FISCO chain

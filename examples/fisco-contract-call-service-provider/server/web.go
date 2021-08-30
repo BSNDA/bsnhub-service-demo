@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/bianjieai/bsnhub-service-demo/examples/fisco-contract-call-service-provider/common"
+	"fisco-contract-call-service-provider/common"
 	"github.com/gin-gonic/gin"
 	"github.com/irisnet/service-sdk-go/service"
 	"io/ioutil"

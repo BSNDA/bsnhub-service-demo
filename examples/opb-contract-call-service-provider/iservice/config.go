@@ -8,7 +8,7 @@ import (
 
 	"github.com/bianjieai/irita-sdk-go/types"
 
-	"github.com/bianjieai/bsnhub-service-demo/examples/opb-contract-call-service-provider/common"
+	"opb-contract-call-service-provider/common"
 )
 
 // default config variables
