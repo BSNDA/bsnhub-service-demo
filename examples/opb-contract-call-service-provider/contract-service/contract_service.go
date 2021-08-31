@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/bianjieai/irita-sdk-go/modules/service"
 	"github.com/bianjieai/irita-sdk-go/modules/wasm"
+	sdk "github.com/bianjieai/irita-sdk-go/types"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"opb-contract-call-service-provider/contract-service/opb"
@@ -99,11 +100,9 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 
 	switch request.Dest.EndpointType {
 	case "service":
-		calldata := base64.StdEncoding.EncodeToString(request.CallData)
-		var invokeServiceReq service.InvokeServiceRequest
-		err := json.Unmarshal([]byte(calldata), &invokeServiceReq)
+		var invokeServiceReq types.InvokeServiceReq
+		err := json.Unmarshal(request.CallData, &invokeServiceReq)
 		if err != nil {
-			//参数不符合规则，直接不处理
 			res.Code = 500
 			res.Message = fmt.Sprintf("can not parse request [%s] input json string : %s", reqID, err.Error())
 			return
@@ -111,10 +110,21 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		if invokeServiceReq.Providers == nil {
 			invokeServiceReq.Providers = []string{request.Dest.EndpointAddress}
 		}
-
-		targetReqCtxID, _, err := cs.opbClient.OpbClient.Service.InvokeService(invokeServiceReq, cs.opbClient.BuildBaseTx())
+		serviceFeeCap, err := sdk.ParseDecCoins(invokeServiceReq.ServiceFeeCap)
 		if err != nil {
-			//参数不符合规则，直接不处理
+			res.Code = 500
+			res.Message = fmt.Sprintf("can not parse request [%s] input json string : %s", reqID, err.Error())
+			return
+		}
+
+		targetReqCtxID, _, err := cs.opbClient.OpbClient.Service.InvokeService(service.InvokeServiceRequest{
+			ServiceName:       invokeServiceReq.ServiceName,
+			Providers:         invokeServiceReq.Providers,
+			Input:             invokeServiceReq.Input,
+			ServiceFeeCap:     serviceFeeCap,
+			Timeout:           invokeServiceReq.Timeout,
+		}, cs.opbClient.BuildBaseTx())
+		if err != nil {
 			res.Code = 500
 			res.Message = fmt.Sprintf("invoke service failed : %s", err.Error())
 			return

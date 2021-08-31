@@ -62,6 +62,15 @@ type ResponseAdaptor struct {
 	ICRequestID string
 }
 
+// InvokeServiceReq defines the request parameters of the service call
+type InvokeServiceReq struct {
+	ServiceName       string       `json:"service_name"`
+	Providers         []string     `json:"providers"`
+	Input             string       `json:"input"`
+	ServiceFeeCap     string `json:"service_fee_cap"`
+	Timeout           int64        `json:"timeout"`
+}
+
 func GetChainIDString(chainID int64) string {
 	return strconv.FormatInt(chainID, 10)
 }

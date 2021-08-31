@@ -10,7 +10,7 @@ import (
 // rootCmd is the entry point
 var (
 	rootCmd = &cobra.Command{
-		Use:   "opb-contract-call-sp",
+		Use:   "irita-opb-provider",
 		Short: "opb service provider daemon command line interface",
 	}
 )
