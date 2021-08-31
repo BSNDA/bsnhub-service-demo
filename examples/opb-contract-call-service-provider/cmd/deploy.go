@@ -17,7 +17,7 @@ func DeployCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "deploy",
 		Short:   "Deploy iservice according to the metadata",
-		Example: `opb-contract-call-sp deploy [config-file]`,
+		Example: `irita-opb-provider deploy [config-file]`,
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			configFileName := ""
@@ -61,7 +61,7 @@ func DeployCmd() *cobra.Command {
 			contractService.Logger = logger
 
 			appInstance := app.NewApp(iserviceClient, contractService, logger)
-
+			appInstance.SetServiceName(config.GetString(common.ConfigKeyServiceName))
 			err = appInstance.DeployIService(string(schemas), string(pricing))
 			if err != nil {
 				return err
