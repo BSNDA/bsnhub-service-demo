@@ -163,10 +163,9 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		}
 		go func() {
 			for {
-				targetReqCtx, err := cs.opbClient.OpbClient.Service.QueryRequestContext(targetReqCtxID)
 				status, err2 := cs.opbClient.OpbClient.Status(context.Background())
 				req, err3 := cs.opbClient.OpbClient.Service.QueryServiceRequest(requests[0].ID)
-				if err != nil || err2 != nil || err3 != nil || targetReqCtx.BatchState == "BATCH_COMPLETED" || status.SyncInfo.LatestBlockHeight > req.ExpirationHeight {
+				if err != nil || err2 != nil || err3 != nil || status.SyncInfo.LatestBlockHeight > req.ExpirationHeight {
 					cs.Logger.Infof("HUB Unsubscribe RequestID is %s", requests[0].ID)
 					res.Code = 500
 					res.Message = fmt.Sprintf("call service timeout")
