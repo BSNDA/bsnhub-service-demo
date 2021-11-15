@@ -166,7 +166,7 @@ func NewServiceClientWrapper(
 	if err != nil {
 		panic("import key missing: " + err.Error())
 	}
-	log.WithField("addr", addr).Debug("import key success")
+	log.WithField("addr", addr).Info("import key success")
 
 	return wrapper
 }

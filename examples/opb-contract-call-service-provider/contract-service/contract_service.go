@@ -83,7 +83,8 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 	if err != nil {
 		res.Code = 204
 		res.Message = "chain params not exist"
-		cs.Logger.Error("chain params not exist")
+		cs.Logger.Error("chain params not exist: ", err)
+
 		return
 	}
 
@@ -94,7 +95,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 	if err != nil {
 		res.Code = 500
 		res.Message = "failed to connect to the opb node"
-
+		cs.Logger.Error("InstantiateClient err: ", err)
 		return
 	}
 
