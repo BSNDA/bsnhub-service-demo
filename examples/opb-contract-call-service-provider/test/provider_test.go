@@ -12,11 +12,11 @@ var svcClient iservice.ServiceClientWrapper
 func init() {
 	svcClient = iservice.NewServiceClientWrapper(
 		"wenchangchain",
-		"http://183.252.194.19:26657",
-		"183.252.194.19:9090",
+		"http://10.1.4.149:36657",
+		"10.1.4.149:39090",
 		"node0",
 		"12345678",
-		"-----BEGIN TENDERMINT PRIVATE KEY-----\nsalt: E9153622631E90E305B065101DD445A0\ntype: sm2\nkdf: bcrypt\n\nTUPYO8bYtJ6ZXAATk7G1+NvB99nrx1Gxj8jmwj1Stw8kiWP4jfnuaugYbJ/AQSAv\nAgfhA4RW/MbEUd/V64kMdpm1GEClZUS8HzXBlls=\n=TqK0\n-----END TENDERMINT PRIVATE KEY-----",
+		"-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: 28E4503C0FA024135BD8D06A457EB235\ntype: sm2\n\nJxEV2LpJzkgHodehJNEun73zj9aMRRXJh3g/DGrTR7Mz5DOvEFSR7nd9aXP+i0in\nBAqhpYt9hb6H/MbNty2kfqTBTcSTHAOzES8R1KQ=\n=HZRz\n-----END TENDERMINT PRIVATE KEY-----",
 	)
 }
 
