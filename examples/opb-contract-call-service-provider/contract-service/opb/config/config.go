@@ -23,19 +23,24 @@ const (
 	DefaultFee   = "default_fee"
 	Timeout      = "timeout"
 	DefaultGas   = "default_gas"
+	AccountKey   = "account"
 )
 
 // BaseConfig defines the base config
 type BaseConfig struct {
-	KeyPath      string
-	KeyName      string
-	Passphrase   string
+	Account      Account `yaml:"account"`
 	RpcAddrsMap  map[string]string
 	GrpcAddrsMap map[string]string
 	ChainId      string
 	DefaultFee   string
 	Timeout      uint
 	DefaultGas   uint64
+}
+
+type Account struct {
+	KeyName    string `yaml:"key_name" mapstructure:"key_name"`
+	Passphrase string `yaml:"passphrase"`
+	KeyArmor   string `yaml:"key_armor" mapstructure:"key_armor"`
 }
 
 // ChainParams defines the params for the specific chain
@@ -53,16 +58,19 @@ type Config struct {
 
 // NewBaseConfig constructs a new BaseConfig instance from viper
 func NewBaseConfig(v *viper.Viper) (*BaseConfig, error) {
+	account := Account{}
+	err := v.UnmarshalKey(common.GetConfigKey(Prefix, AccountKey), &account)
+	if err != nil {
+		return nil, err
+	}
 	config := new(BaseConfig)
-	config.KeyPath = v.GetString(common.GetConfigKey(Prefix, KeyPath))
 	config.ChainId = v.GetString(common.GetConfigKey(Prefix, ChainId))
-	config.KeyName = v.GetString(common.GetConfigKey(Prefix, KeyName))
-	config.Passphrase = v.GetString(common.GetConfigKey(Prefix, Passphrase))
 	config.RpcAddrsMap = v.GetStringMapString(common.GetConfigKey(Prefix, RpcAddrsMap))
 	config.GrpcAddrsMap = v.GetStringMapString(common.GetConfigKey(Prefix, GrpcAddrsMap))
 	config.DefaultFee = v.GetString(common.GetConfigKey(Prefix, DefaultFee))
 	config.Timeout = v.GetUint(common.GetConfigKey(Prefix, Timeout))
 	config.DefaultGas = v.GetUint64(common.GetConfigKey(Prefix, DefaultGas))
+	config.Account = account
 
 	return config, nil
 }

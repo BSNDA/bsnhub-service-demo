@@ -3,6 +3,7 @@ package iservice
 import (
 	"encoding/json"
 	"github.com/go-errors/errors"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/bianjieai/iritamod-sdk-go/service"
 	"github.com/bianjieai/iritamod-sdk-go/wasm"
@@ -161,10 +162,11 @@ func NewServiceClientWrapper(
 		Passphrase:  passphrase,
 		IritaClient: NewServiceClient(config),
 	}
-	_, err = wrapper.ImportKey(keyName, passphrase, keyArmor)
+	addr, err := wrapper.ImportKey(keyName, passphrase, keyArmor)
 	if err != nil {
 		panic("import key missing: " + err.Error())
 	}
+	log.WithField("addr", addr).Debug("import key success")
 
 	return wrapper
 }
