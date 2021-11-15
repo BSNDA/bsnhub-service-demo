@@ -89,7 +89,7 @@ func (f *OpbChain) InstantiateClient(
 	f.OpbClient = opbClient
 
 	// import
-	addr, err := f.OpbClient.Import(config.Account.KeyName, config.Account.Passphrase, config.Account.Passphrase)
+	addr, err := f.OpbClient.Import(config.Account.KeyName, config.Account.Passphrase, config.Account.KeyArmor)
 	if err != nil {
 		return fmt.Errorf("opb chain import key failed: %s", err)
 	}
