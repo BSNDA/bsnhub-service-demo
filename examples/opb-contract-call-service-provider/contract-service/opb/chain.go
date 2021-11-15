@@ -11,6 +11,10 @@ import (
 	"opb-contract-call-service-provider/server"
 )
 
+const (
+	defaultKeyAlgorithm = "sm2"
+)
+
 // OpbChain defines the Opb chain
 type OpbChain struct {
 	OpbClient    *iservice.ServiceClient
@@ -61,13 +65,17 @@ func (f *OpbChain) InstantiateClient(
 	if ok {
 		grpcAddr = grpcAddrstr
 	}
-	fees, _ := sdk.ParseDecCoins(config.DefaultFee)
+	fees, err := sdk.ParseDecCoins(config.DefaultFee)
+	if err != nil {
+		return err
+	}
 	options := []sdk.Option{
 		sdk.CachedOption(true),
 		sdk.KeyDAOOption(storetypes.NewMemory(nil)),
 		sdk.FeeOption(fees),
 		sdk.GasOption(config.DefaultGas),
 		sdk.TimeoutOption(config.Timeout),
+		sdk.AlgoOption(defaultKeyAlgorithm),
 	}
 
 	clientConfig, err := sdk.NewClientConfig(rpcAddr, grpcAddr, config.BaseConfig.ChainId, options...)
@@ -85,7 +93,7 @@ func (f *OpbChain) InstantiateClient(
 	if err != nil {
 		return fmt.Errorf("opb chain import key failed: %s", err)
 	}
-	log.WithField("addr", addr).Debug("import key success")
+	log.WithField("addr", addr).Info("import key success")
 	return nil
 }
 
