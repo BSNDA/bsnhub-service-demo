@@ -16,7 +16,7 @@ func init() {
 		"10.1.4.149:39090",
 		"node0",
 		"12345678",
-		"-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: 28E4503C0FA024135BD8D06A457EB235\ntype: sm2\n\nJxEV2LpJzkgHodehJNEun73zj9aMRRXJh3g/DGrTR7Mz5DOvEFSR7nd9aXP+i0in\nBAqhpYt9hb6H/MbNty2kfqTBTcSTHAOzES8R1KQ=\n=HZRz\n-----END TENDERMINT PRIVATE KEY-----",
+		"-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: E82064503E284EE753B13E9424B08B4C\ntype: sm2\n\nqLgix+DPFfNY+TpWWlNmquy3jUDR314/dJmIxw8JCWGiSn4deFtp8IWGH/mnVe6S\nNdGt6OJ2SbwO098fk16Gw6RO+MgVjShVMXbkggc=\n=h7AT\n-----END TENDERMINT PRIVATE KEY-----",
 	)
 }
 
@@ -28,7 +28,7 @@ func TestExecute(t *testing.T) {
 			sdk.NewInt(400)))
 
 	resultTx, err := svcClient.IritaClient.WASM.Execute(
-		"iaa142r3lvrefe0xl0h6yvyql9d0fmvawmp5wwgp2j",
+		"iaa1nc5tatafv6eyq7llkr2gv50ff9e22mnfgrs38c",
 		wasm.NewContractABI().WithMethod("hello").WithArgs("words", "ori"),
 		sdk.NewCoins(sdk.NewCoin("upoint", sdk.NewInt(1000000))),
 		sdk.BaseTx{
