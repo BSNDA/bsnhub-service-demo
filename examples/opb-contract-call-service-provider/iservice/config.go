@@ -18,7 +18,7 @@ var (
 	defaultNodeGRPCAddr  = "127.0.0.1:9090"
 	defaultKeyPath       = os.ExpandEnv(filepath.Join("$HOME", ".iritacli"))
 	defaultGas           = uint64(200000)
-	defaultFee           = "400upoint"
+	defaultFee           = "4point"
 	defaultBroadcastMode = sdk.Commit
 	defaultKeyAlgorithm  = "sm2"
 )

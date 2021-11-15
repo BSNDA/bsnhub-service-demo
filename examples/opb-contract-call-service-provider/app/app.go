@@ -75,7 +75,7 @@ func (app *App) DeployIService(schemas string, pricing string) error {
 	if err != nil {
 		app.Logger.Infof("binding service")
 
-		err := app.IServiceClient.BindService(app.ServiceName, "1000000000upoint", pricing, "{}", 100)
+		err := app.IServiceClient.BindService(app.ServiceName, "100000point", pricing, "{}", 100)
 		if err != nil {
 			return fmt.Errorf("failed to bind service: %s", err.Error())
 		}
