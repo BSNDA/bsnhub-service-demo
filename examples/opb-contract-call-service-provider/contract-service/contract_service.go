@@ -5,9 +5,9 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/bianjieai/irita-sdk-go/modules/service"
-	"github.com/bianjieai/irita-sdk-go/modules/wasm"
-	sdk "github.com/bianjieai/irita-sdk-go/types"
+	"github.com/bianjieai/iritamod-sdk-go/service"
+	"github.com/bianjieai/iritamod-sdk-go/wasm"
+	sdk "github.com/irisnet/core-sdk-go/types"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"opb-contract-call-service-provider/contract-service/opb"
@@ -60,7 +60,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			var outputBz []byte
 			var headerBz []byte
 			headerBz, _ = json.Marshal(reqHeader)
-			outputBz, _ = json.Marshal(types.Output{Result: callResult,TxHash: txHash})
+			outputBz, _ = json.Marshal(types.Output{Result: callResult, TxHash: txHash})
 			output = fmt.Sprintf(`{"header":%s,"body":%s}`, headerBz, outputBz)
 		}
 
@@ -118,11 +118,11 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		}
 
 		targetReqCtxID, _, err := cs.opbClient.OpbClient.Service.InvokeService(service.InvokeServiceRequest{
-			ServiceName:       invokeServiceReq.ServiceName,
-			Providers:         invokeServiceReq.Providers,
-			Input:             invokeServiceReq.Input,
-			ServiceFeeCap:     serviceFeeCap,
-			Timeout:           invokeServiceReq.Timeout,
+			ServiceName:   invokeServiceReq.ServiceName,
+			Providers:     invokeServiceReq.Providers,
+			Input:         invokeServiceReq.Input,
+			ServiceFeeCap: serviceFeeCap,
+			Timeout:       invokeServiceReq.Timeout,
 		}, cs.opbClient.BuildBaseTx())
 		if err != nil {
 			res.Code = 500
@@ -143,11 +143,11 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			return
 		}
 		ch := make(chan int)
-		callbackWrapper := func(targetReqCtxID, requestID, result string, response string) {
+		callbackWrapper := func(reqCtxID, reqID, responses string) {
 			resp := types.ResponseAdaptor{
 				StatusCode: 200,
 				Result:     result,
-				Output:     response,
+				Output:     responses,
 			}
 			callResultbyte, _ := json.Marshal(resp)
 			callResult = string(callResultbyte)
@@ -176,7 +176,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 				time.Sleep(time.Second)
 			}
 		}()
-		<- ch
+		<-ch
 
 	default:
 		execAbi := wasm.NewContractABI().
@@ -196,18 +196,18 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 				res.Message = err.Error()
 
 				return
-			}else  {
+			} else {
 				cs.Logger.Infof("call fabric error don't has 'the request has been received',record trans")
-				store.InitProviderTransRecord(request.Header.ReqSequence,request.Dest.ChainID,reqID,"",err.Error(),store.TxStatus_Error)
+				store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, "", err.Error(), store.TxStatus_Error)
 				//store.TargetChainInfo(&InsectCrossInfo)
 				res.Code = 500
 				res.Message = err.Error()
 				return
 			}
 		}
-		txHash = resultTx.Hash
+		txHash = resultTx.Hash.String()
 
-		err = cs.opbClient.WaitForSuccess(resultTx.Hash, "callService")
+		err = cs.opbClient.WaitForSuccess(resultTx.Hash.String(), "callService")
 		if err != nil {
 			//mysql.TxErrCollection(reqID, err.Error())
 			cs.Logger.Errorf("Opb ChainId %s Chaincode %s WaitForReceipt has error %v", request.Dest.ChainID, request.Dest.EndpointAddress, err)
@@ -218,9 +218,9 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 				res.Message = err.Error()
 
 				return
-			}else  {
+			} else {
 				cs.Logger.Infof("call fabric error don't has 'the request has been received',record trans")
-				store.InitProviderTransRecord(request.Header.ReqSequence,request.Dest.ChainID,reqID,"",err.Error(),store.TxStatus_Error)
+				store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, "", err.Error(), store.TxStatus_Error)
 				//store.TargetChainInfo(&InsectCrossInfo)
 				res.Code = 500
 				res.Message = err.Error()
@@ -228,13 +228,13 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 			}
 		}
 
-		for _, e := range resultTx.Events {
+		for _, e := range resultTx.TxResult.Events {
 			if e.Type == "wasm" && len(e.Attributes) > 1 {
 				for _, attr := range e.Attributes {
-					if attr.Key == "contract_address" && attr.Value == request.Dest.EndpointAddress {
+					if string(attr.Key) == "contract_address" && string(attr.Value) == request.Dest.EndpointAddress {
 						for _, attr = range e.Attributes {
-							if attr.Key == "result" {
-								callResult = attr.Value
+							if string(attr.Key) == "result" {
+								callResult = string(attr.Value)
 							}
 						}
 					}
@@ -244,6 +244,6 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 	}
 
 	//mysql.OnContractTxSend(reqID, txHash)
-	store.InitProviderTransRecord(request.Header.ReqSequence,request.Dest.ChainID,reqID,txHash,"",store.TxStatus_Unknow)
+	store.InitProviderTransRecord(request.Header.ReqSequence, request.Dest.ChainID, reqID, txHash, "", store.TxStatus_Unknow)
 	return output, result
 }

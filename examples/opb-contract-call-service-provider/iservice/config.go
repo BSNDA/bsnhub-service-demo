@@ -1,12 +1,12 @@
 package iservice
 
 import (
+	"fmt"
+	sdk "github.com/irisnet/core-sdk-go/types"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/viper"
-
-	"github.com/bianjieai/irita-sdk-go/types"
 
 	"opb-contract-call-service-provider/common"
 )
@@ -18,8 +18,8 @@ var (
 	defaultNodeGRPCAddr  = "127.0.0.1:9090"
 	defaultKeyPath       = os.ExpandEnv(filepath.Join("$HOME", ".iritacli"))
 	defaultGas           = uint64(200000)
-	defaultFee           = "4point"
-	defaultBroadcastMode = types.Commit
+	defaultFee           = "400upoint"
+	defaultBroadcastMode = sdk.Commit
 	defaultKeyAlgorithm  = "sm2"
 )
 
@@ -28,6 +28,7 @@ const (
 	ChainID      = "chain_id"
 	NodeRPCAddr  = "node_rpc_addr"
 	NodeGRPCAddr = "node_grpc_addr"
+	AccountKey   = "account"
 	KeyPath      = "key_path"
 	KeyName      = "key_name"
 	Passphrase   = "passphrase"
@@ -35,23 +36,31 @@ const (
 
 // Config is a config struct for iservice
 type Config struct {
-	ChainID      string            `yaml:"chain_id"`
-	NodeRPCAddr  string            `yaml:"node_rpc_addr"`
-	NodeGRPCAddr string            `yaml:"node_grpc_addr"`
-	KeyPath      string            `yaml:"key_path"`
-	KeyName      string            `yaml:"key_name"`
-	Passphrase   string            `yaml:"passphrase"`
-	NodesMap     map[string]string `yaml:"nodes"`
+	ChainID      string `yaml:"chain_id"`
+	NodeRPCAddr  string `yaml:"node_rpc_addr"`
+	NodeGRPCAddr string `yaml:"node_grpc_addr"`
+
+	NodesMap map[string]string `yaml:"nodes"`
+	Account  Account           `yaml:"account"`
+}
+
+type Account struct {
+	KeyName    string `yaml:"key_name" mapstructure:"key_name"`
+	Passphrase string `yaml:"passphrase"`
+	KeyArmor   string `yaml:"key_armor" mapstructure:"key_armor"`
 }
 
 // NewConfig constructs a new Config from viper
 func NewConfig(v *viper.Viper) Config {
+	account := Account{}
+	err := v.UnmarshalKey(common.GetConfigKey(Prefix, AccountKey), &account)
+	if err != nil {
+		fmt.Println(err)
+	}
 	return Config{
 		ChainID:      v.GetString(common.GetConfigKey(Prefix, ChainID)),
 		NodeRPCAddr:  v.GetString(common.GetConfigKey(Prefix, NodeRPCAddr)),
 		NodeGRPCAddr: v.GetString(common.GetConfigKey(Prefix, NodeGRPCAddr)),
-		KeyPath:      v.GetString(common.GetConfigKey(Prefix, KeyPath)),
-		KeyName:      v.GetString(common.GetConfigKey(Prefix, KeyName)),
-		Passphrase:   v.GetString(common.GetConfigKey(Prefix, Passphrase)),
+		Account:      account,
 	}
 }

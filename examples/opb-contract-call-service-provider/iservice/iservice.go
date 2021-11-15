@@ -2,15 +2,23 @@ package iservice
 
 import (
 	"encoding/json"
+	"github.com/go-errors/errors"
+
+	"github.com/bianjieai/iritamod-sdk-go/service"
+	"github.com/bianjieai/iritamod-sdk-go/wasm"
+
+	"github.com/irisnet/core-sdk-go/client"
+	"github.com/irisnet/core-sdk-go/codec"
+	cdctypes "github.com/irisnet/core-sdk-go/codec/types"
+	cryptocodec "github.com/irisnet/core-sdk-go/crypto/codec"
+	"github.com/irisnet/core-sdk-go/modules/bank"
+	sdk "github.com/irisnet/core-sdk-go/types"
+	storetypes "github.com/irisnet/core-sdk-go/types/store"
+	txtypes "github.com/irisnet/core-sdk-go/types/tx"
 
 	txStore "opb-contract-call-service-provider/mysql/store"
 	"opb-contract-call-service-provider/types"
-	servicesdk "github.com/bianjieai/irita-sdk-go"
-	"github.com/bianjieai/irita-sdk-go/modules/service"
-	sdk "github.com/bianjieai/irita-sdk-go/types"
-	"github.com/bianjieai/irita-sdk-go/types/store"
 )
-
 
 const (
 	eventTypeNewBatchRequestProvider = "new_batch_request_provider"
@@ -29,7 +37,76 @@ type ServiceClientWrapper struct {
 	KeyName    string
 	Passphrase string
 
-	IritaClient servicesdk.IRITAClient
+	IritaClient *ServiceClient
+}
+
+type ServiceClient struct {
+	encodingConfig sdk.EncodingConfig
+	sdk.BaseClient
+	Bank    bank.Client
+	Service service.Client
+	WASM    wasm.Client
+}
+
+func NewServiceClient(config sdk.ClientConfig) *ServiceClient {
+	encodingConfig := makeEncodingConfig()
+	baseClient := client.NewBaseClient(config, encodingConfig, nil)
+	bankClient := bank.NewClient(baseClient, encodingConfig.Codec)
+	serviceClient := service.NewClient(baseClient, encodingConfig.Codec)
+	wasmClient := wasm.NewClient(baseClient)
+	sc := &ServiceClient{
+		encodingConfig: encodingConfig,
+		BaseClient:     baseClient,
+		Bank:           bankClient,
+		Service:        serviceClient,
+		WASM:           wasmClient,
+	}
+
+	sc.RegisterModule(
+		bankClient,
+		serviceClient,
+		wasmClient,
+	)
+
+	return sc
+}
+
+func (sc *ServiceClient) RegisterModule(ms ...sdk.Module) {
+	for _, m := range ms {
+		m.RegisterInterfaceTypes(sc.encodingConfig.InterfaceRegistry)
+	}
+}
+
+//client init
+func makeEncodingConfig() sdk.EncodingConfig {
+	amino := codec.NewLegacyAmino()
+	interfaceRegistry := cdctypes.NewInterfaceRegistry()
+	marshaler := codec.NewProtoCodec(interfaceRegistry)
+	txCfg := txtypes.NewTxConfig(marshaler, txtypes.DefaultSignModes)
+
+	encodingConfig := sdk.EncodingConfig{
+		InterfaceRegistry: interfaceRegistry,
+		TxConfig:          txCfg,
+		Amino:             amino,
+		Codec:             marshaler,
+	}
+	registerLegacyAminoCodec(encodingConfig.Amino)
+	registerInterfaces(encodingConfig.InterfaceRegistry)
+	return encodingConfig
+}
+
+// RegisterLegacyAminoCodec registers the sdk message type.
+func registerLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	cdc.RegisterInterface((*sdk.Msg)(nil), nil)
+	cdc.RegisterInterface((*sdk.Tx)(nil), nil)
+	cryptocodec.RegisterCrypto(cdc)
+}
+
+// RegisterInterfaces registers the sdk message type.
+func registerInterfaces(registry cdctypes.InterfaceRegistry) {
+	registry.RegisterInterface("cosmos.v1beta1.Msg", (*sdk.Msg)(nil))
+	txtypes.RegisterInterfaces(registry)
+	cryptocodec.RegisterInterfaces(registry)
 }
 
 // NewServiceClientWrapper constructs a new ServiceClientWrapper
@@ -37,9 +114,9 @@ func NewServiceClientWrapper(
 	chainID string,
 	nodeRPCAddr string,
 	nodeGRPCAddr string,
-	keyPath string,
 	keyName string,
 	passphrase string,
+	keyArmor string,
 ) ServiceClientWrapper {
 	if len(chainID) == 0 {
 		chainID = defaultChainID
@@ -53,8 +130,8 @@ func NewServiceClientWrapper(
 		nodeGRPCAddr = defaultNodeGRPCAddr
 	}
 
-	if len(keyPath) == 0 {
-		keyPath = defaultKeyPath
+	if keyName == "" || passphrase == "" || keyArmor == "" {
+		panic("account miss: key_name or passphrase or KeyArmor is missing")
 	}
 
 	fee, err := sdk.ParseDecCoins(defaultFee)
@@ -62,25 +139,31 @@ func NewServiceClientWrapper(
 		panic(err)
 	}
 
-	config := sdk.ClientConfig{
-		NodeURI:  nodeRPCAddr,
-		GRPCAddr: nodeGRPCAddr,
-		ChainID:  chainID,
-		Gas:      defaultGas,
-		Fee:      fee,
-		Mode:     defaultBroadcastMode,
-		Algo:     defaultKeyAlgorithm,
-		KeyDAO:   store.NewFileDAO(keyPath),
-		Timeout:  5,
+	config, err := sdk.NewClientConfig(
+		nodeRPCAddr,
+		nodeGRPCAddr,
+		chainID,
+		sdk.FeeOption(fee),
+		sdk.GasOption(defaultGas),
+		sdk.ModeOption(defaultBroadcastMode),
+		sdk.AlgoOption(defaultKeyAlgorithm),
+		sdk.KeyDAOOption(storetypes.NewMemory(nil)),
+		sdk.TimeoutOption(5),
+	)
+	if err != nil {
+		panic(err)
 	}
 
 	wrapper := ServiceClientWrapper{
-		ChainID:       chainID,
-		NodeRPCAddr:   nodeRPCAddr,
-		KeyPath:       keyPath,
-		KeyName:       keyName,
-		Passphrase:    passphrase,
-		IritaClient: servicesdk.NewIRITAClient(config),
+		ChainID:     chainID,
+		NodeRPCAddr: nodeRPCAddr,
+		KeyName:     keyName,
+		Passphrase:  passphrase,
+		IritaClient: NewServiceClient(config),
+	}
+	_, err = wrapper.ImportKey(keyName, passphrase, keyArmor)
+	if err != nil {
+		panic("import key missing: " + err.Error())
 	}
 
 	return wrapper
@@ -92,9 +175,9 @@ func MakeServiceClientWrapper(config Config) ServiceClientWrapper {
 		config.ChainID,
 		config.NodeRPCAddr,
 		config.NodeGRPCAddr,
-		config.KeyPath,
-		config.KeyName,
-		config.Passphrase,
+		config.Account.KeyName,
+		config.Account.Passphrase,
+		config.Account.KeyArmor,
 	)
 }
 
@@ -103,7 +186,7 @@ func (s ServiceClientWrapper) SubscribeServiceRequest(serviceName string, cb ser
 	baseTx := s.BuildBaseTx()
 	provider, e := s.IritaClient.QueryAddress(baseTx.From, baseTx.Password)
 	if e != nil {
-		return sdk.Wrap(e)
+		return errors.New(e)
 	}
 
 	builder := sdk.NewEventQueryBuilder().AddCondition(
@@ -121,11 +204,11 @@ func (s ServiceClientWrapper) SubscribeServiceRequest(serviceName string, cb ser
 			)
 		}
 		for _, msg := range msgs {
-			msg , ok := msg.(*service.MsgRespondService)
+			msg, ok := msg.(*service.MsgRespondService)
 
 			data := &txStore.ProviderResInfo{
 				TxStatus: txStore.TxStatus_Success,
-				ErrMsg: "",
+				ErrMsg:   "",
 			}
 
 			if ok {
@@ -135,11 +218,12 @@ func (s ServiceClientWrapper) SubscribeServiceRequest(serviceName string, cb ser
 			resTx, err := s.IritaClient.BuildAndSend([]sdk.Msg{msg}, baseTx)
 			if err != nil {
 				data.TxStatus = txStore.TxStatus_Error
-				data.ErrMsg =err.Error()
+				data.ErrMsg = err.Error()
 				s.IritaClient.Logger().Error("provider respond failed", "errMsg", err.Error())
 				//mysql.TxErrCollection(msg.RequestId, err.Error())
-			}else{
-				data.HUBResTxId =  resTx.Hash
+			} else {
+				// todo check it
+				data.HUBResTxId = resTx.Hash.String()
 				//mysql.OnInterchainResponseSent(msg.RequestId, resTx.Hash)
 			}
 
@@ -148,7 +232,6 @@ func (s ServiceClientWrapper) SubscribeServiceRequest(serviceName string, cb ser
 	})
 	return err
 }
-
 
 func (s ServiceClientWrapper) GenServiceResponseMsgs(events sdk.StringEvents, serviceName string,
 	provider sdk.AccAddress,
@@ -197,7 +280,7 @@ func (s ServiceClientWrapper) GenServiceResponseMsgs(events sdk.StringEvents, se
 			output, result := handler(request.RequestContextID, reqID, request.Input)
 			var resultObj types.Result
 			json.Unmarshal([]byte(result), &resultObj)
-			if resultObj.Code != 204{
+			if resultObj.Code != 204 {
 				msgs = append(msgs, &service.MsgRespondService{
 					RequestId: reqID,
 					Provider:  providerStr,
@@ -209,7 +292,6 @@ func (s ServiceClientWrapper) GenServiceResponseMsgs(events sdk.StringEvents, se
 	}
 	return msgs
 }
-
 
 // DefineService wraps iservice.DefineService
 func (s ServiceClientWrapper) DefineService(

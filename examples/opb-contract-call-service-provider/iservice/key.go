@@ -28,5 +28,5 @@ func (s ServiceClientWrapper) ExportKey(name string, passphrase string) (keyArmo
 
 // RecoverKey recover the specified key
 func (s ServiceClientWrapper) RecoverKey(name string, passphrase string, mnemonic string) (addr string, err error) {
-	return s.IritaClient.Recover(name, passphrase, mnemonic)
+	return s.IritaClient.Recover(name, passphrase, mnemonic, "")
 }
