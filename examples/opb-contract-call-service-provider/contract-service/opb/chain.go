@@ -31,8 +31,8 @@ func NewOpbChain(
 // BuildBaseTx builds a base tx
 func (opb *OpbChain) BuildBaseTx() sdk.BaseTx {
 	return sdk.BaseTx{
-		From:     opb.BaseConfig.KeyName,
-		Password: opb.BaseConfig.Passphrase,
+		From:     opb.BaseConfig.Account.KeyName,
+		Password: opb.BaseConfig.Account.Passphrase,
 		Mode:     sdk.Commit,
 	}
 }

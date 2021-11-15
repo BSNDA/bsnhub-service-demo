@@ -27,7 +27,7 @@ opb:
   account:
     key_name: node1
     passphrase: 12345678
-    memnomic: "-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: E82064503E284EE753B13E9424B08B4C\ntype: sm2\n\nqLgix+DPFfNY+TpWWlNmquy3jUDR314/dJmIxw8JCWGiSn4deFtp8IWGH/mnVe6S\nNdGt6OJ2SbwO098fk16Gw6RO+MgVjShVMXbkggc=\n=h7AT\n-----END TENDERMINT PRIVATE KEY-----"
+    key_armor: "-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: 28E4503C0FA024135BD8D06A457EB235\ntype: sm2\n\nJxEV2LpJzkgHodehJNEun73zj9aMRRXJh3g/DGrTR7Mz5DOvEFSR7nd9aXP+i0in\nBAqhpYt9hb6H/MbNty2kfqTBTcSTHAOzES8R1KQ=\n=HZRz\n-----END TENDERMINT PRIVATE KEY-----"
   default_fee: 5000000upoint
   default_gas: 500000
   monitor_interval: 2 # chain monitoring interval in seconds

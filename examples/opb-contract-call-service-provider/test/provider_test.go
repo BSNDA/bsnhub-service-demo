@@ -12,11 +12,11 @@ var svcClient iservice.ServiceClientWrapper
 func init() {
 	svcClient = iservice.NewServiceClientWrapper(
 		"wenchangchain",
-		"http://10.1.4.149:36657",
-		"10.1.4.149:39090",
+		"http://183.252.194.19:26657",
+		"183.252.194.19:9090",
 		"node0",
 		"12345678",
-		"-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: E82064503E284EE753B13E9424B08B4C\ntype: sm2\n\nqLgix+DPFfNY+TpWWlNmquy3jUDR314/dJmIxw8JCWGiSn4deFtp8IWGH/mnVe6S\nNdGt6OJ2SbwO098fk16Gw6RO+MgVjShVMXbkggc=\n=h7AT\n-----END TENDERMINT PRIVATE KEY-----",
+		"-----BEGIN TENDERMINT PRIVATE KEY-----\nsalt: E9153622631E90E305B065101DD445A0\ntype: sm2\nkdf: bcrypt\n\nTUPYO8bYtJ6ZXAATk7G1+NvB99nrx1Gxj8jmwj1Stw8kiWP4jfnuaugYbJ/AQSAv\nAgfhA4RW/MbEUd/V64kMdpm1GEClZUS8HzXBlls=\n=TqK0\n-----END TENDERMINT PRIVATE KEY-----",
 	)
 }
 
@@ -28,7 +28,7 @@ func TestExecute(t *testing.T) {
 			sdk.NewInt(400)))
 
 	resultTx, err := svcClient.IritaClient.WASM.Execute(
-		"iaa1nc5tatafv6eyq7llkr2gv50ff9e22mnfgrs38c",
+		"iaa142r3lvrefe0xl0h6yvyql9d0fmvawmp5wwgp2j",
 		wasm.NewContractABI().WithMethod("hello").WithArgs("words", "ori"),
 		sdk.NewCoins(sdk.NewCoin("upoint", sdk.NewInt(1000000))),
 		sdk.BaseTx{
