@@ -222,7 +222,6 @@ func (s ServiceClientWrapper) SubscribeServiceRequest(serviceName string, cb ser
 				s.IritaClient.Logger().Error("provider respond failed", "errMsg", err.Error())
 				//mysql.TxErrCollection(msg.RequestId, err.Error())
 			} else {
-				// todo check it
 				data.HUBResTxId = resTx.Hash.String()
 				//mysql.OnInterchainResponseSent(msg.RequestId, resTx.Hash)
 			}
