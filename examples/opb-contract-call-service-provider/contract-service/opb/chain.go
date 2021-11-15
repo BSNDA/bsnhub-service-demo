@@ -4,6 +4,7 @@ import (
 	"fmt"
 	sdk "github.com/irisnet/core-sdk-go/types"
 	storetypes "github.com/irisnet/core-sdk-go/types/store"
+	log "github.com/sirupsen/logrus"
 	"opb-contract-call-service-provider/common"
 	opbcfg "opb-contract-call-service-provider/contract-service/opb/config"
 	"opb-contract-call-service-provider/iservice"
@@ -78,6 +79,13 @@ func (f *OpbChain) InstantiateClient(
 
 	opbClient := iservice.NewServiceClient(clientConfig)
 	f.OpbClient = opbClient
+
+	// import
+	addr, err := f.OpbClient.Import(config.Account.KeyName, config.Account.Passphrase, config.Account.Passphrase)
+	if err != nil {
+		return fmt.Errorf("opb chain import key failed: %s", err)
+	}
+	log.WithField("addr", addr).Debug("import key success")
 	return nil
 }
 
