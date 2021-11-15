@@ -5,28 +5,30 @@ base:
 
 # iservice config
 iservice:
-  chain_id: irita
-  node_rpc_addr: http://127.0.0.1:26657
-  node_grpc_addr: 127.0.0.1:9090
-  key_path: .keys/iservice
-  key_name: node0
-  passphrase: 1234567890
+  chain_id: wenchangchain
+  node_rpc_addr: http://10.1.4.149:36657
+  node_grpc_addr: 10.1.4.149:39090
+  account:
+    key_name: node0
+    passphrase: 12345678
+    key_armor: "-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: E82064503E284EE753B13E9424B08B4C\ntype: sm2\n\nqLgix+DPFfNY+TpWWlNmquy3jUDR314/dJmIxw8JCWGiSn4deFtp8IWGH/mnVe6S\nNdGt6OJ2SbwO098fk16Gw6RO+MgVjShVMXbkggc=\n=h7AT\n-----END TENDERMINT PRIVATE KEY-----"
 
 service:
   service_name: cc-contract-call
 
 # opb config
 opb:
-  chain_id: test
+  chain_id: wenchangchain
   rpc_addrs:
-    opb1.bsnbase.com: http://127.0.0.1:26658
+    opb1.bsnbase.com: http://10.1.4.149:36657
   grpc_addrs:
-    opb1.bsnbase.com: 127.0.0.1:9091
+    opb1.bsnbase.com: 10.1.4.149:39090
   timeout: 20
-  key_path: .keys/iservice
-  key_name: node1
-  passphrase: 1234567890
-  default_fee: 5000000uirita
+  account:
+    key_name: node1
+    passphrase: 12345678
+    memnomic: "-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: E82064503E284EE753B13E9424B08B4C\ntype: sm2\n\nqLgix+DPFfNY+TpWWlNmquy3jUDR314/dJmIxw8JCWGiSn4deFtp8IWGH/mnVe6S\nNdGt6OJ2SbwO098fk16Gw6RO+MgVjShVMXbkggc=\n=h7AT\n-----END TENDERMINT PRIVATE KEY-----"
+  default_fee: 5000000upoint
   default_gas: 500000
   monitor_interval: 2 # chain monitoring interval in seconds
 
