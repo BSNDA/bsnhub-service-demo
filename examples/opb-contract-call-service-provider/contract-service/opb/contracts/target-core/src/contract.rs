@@ -1,54 +1,53 @@
 use cosmwasm_std::{
-    to_binary, Deps,Binary, HumanAddr, DepsMut, Env, HandleResponse, InitResponse, MessageInfo,CosmosMsg, WasmMsg, StdResult
-};
+    to_binary, entry_point, Deps, Binary, HumanAddr, DepsMut, Env, Response, MessageInfo, WasmMsg, StdResult, SubMsg};
 
 use crate::error::ContractError;
-use crate::msg::{HandleMsg, InitMsg,QueryMsg};
+use crate::msg::{HandleMsg, InitMsg, QueryMsg};
 use crate::state::REQUESTS;
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
-pub fn init(
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn instantiate(
     _deps: DepsMut,
     _env: Env,
-    _sinfo: MessageInfo,
+    _info: MessageInfo,
     _msg: InitMsg,
-) -> Result<InitResponse, ContractError> {
-    Ok(InitResponse::default())
+) -> Result<Response, ContractError> {
+    Ok(Response::default())
 }
 
 // And declare a custom Error variant for the ones where you will want to make use of it
-pub fn handle(
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn execute(
     deps: DepsMut,
     _env: Env,
     _info: MessageInfo,
     msg: HandleMsg,
-) -> Result<HandleResponse, ContractError> {
+) -> Result<Response, ContractError>  {
     match msg {
         HandleMsg::CallService{request_id, endpoint_address, call_data} 
         => call_service(deps, request_id, endpoint_address, call_data),
     }
 }
 
-pub fn call_service(deps: DepsMut, request_id:String, endpoint_address: HumanAddr, call_data: Binary) -> Result<HandleResponse, ContractError> {
+pub fn call_service(deps: DepsMut, request_id:String, endpoint_address: HumanAddr, call_data: Binary) -> Result<Response, ContractError>  {
     let executed = REQUESTS.load(deps.storage, &request_id);
     if executed.is_ok() {
         Err(ContractError::Unauthorized{})
     }else{
-        let msg = call_data;
-        let msgs = vec![CosmosMsg::Wasm(WasmMsg::Execute {
-            contract_addr: endpoint_address,
-            msg: msg,
-            send: vec![],
+        let single_msg = call_data;
+
+        let messages =vec![SubMsg::new(WasmMsg::Execute {
+            contract_addr: endpoint_address.to_string(),
+            msg: single_msg,
+            funds: vec![],
         })];
 
         REQUESTS.save(deps.storage, &request_id, &true)?;
-
-        Ok(HandleResponse {
-            messages: msgs,
-            data: None,
-            attributes: vec![],
-        })
+        let mut res = Response::default();
+        res.messages = messages;
+        Ok(res)
     }
 }
 
