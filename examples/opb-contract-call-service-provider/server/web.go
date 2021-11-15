@@ -1,11 +1,11 @@
 package server
 
 import (
-	"opb-contract-call-service-provider/common"
-	"github.com/bianjieai/irita-sdk-go/modules/service"
+	"github.com/bianjieai/iritamod-sdk-go/service"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
+	"opb-contract-call-service-provider/common"
 )
 
 var (

@@ -2,17 +2,17 @@ package opb
 
 import (
 	"fmt"
+	sdk "github.com/irisnet/core-sdk-go/types"
+	storetypes "github.com/irisnet/core-sdk-go/types/store"
 	"opb-contract-call-service-provider/common"
 	opbcfg "opb-contract-call-service-provider/contract-service/opb/config"
+	"opb-contract-call-service-provider/iservice"
 	"opb-contract-call-service-provider/server"
-	sdk "github.com/bianjieai/irita-sdk-go"
-	sdktypes "github.com/bianjieai/irita-sdk-go/types"
-	sdkstore "github.com/bianjieai/irita-sdk-go/types/store"
 )
 
 // OpbChain defines the Opb chain
 type OpbChain struct {
-	OpbClient    sdk.IRITAClient
+	OpbClient    *iservice.ServiceClient
 	ChainManager *server.ChainManager
 	BaseConfig   opbcfg.BaseConfig
 }
@@ -29,11 +29,11 @@ func NewOpbChain(
 }
 
 // BuildBaseTx builds a base tx
-func (opb *OpbChain) BuildBaseTx() sdktypes.BaseTx {
-	return sdktypes.BaseTx{
+func (opb *OpbChain) BuildBaseTx() sdk.BaseTx {
+	return sdk.BaseTx{
 		From:     opb.BaseConfig.KeyName,
 		Password: opb.BaseConfig.Passphrase,
-		Mode:     sdktypes.Commit,
+		Mode:     sdk.Commit,
 	}
 }
 
@@ -60,23 +60,23 @@ func (f *OpbChain) InstantiateClient(
 	if ok {
 		grpcAddr = grpcAddrstr
 	}
-	fees, _ := sdktypes.ParseDecCoins(config.DefaultFee)
-	options := []sdktypes.Option{
-		sdktypes.CachedOption(true),
-		sdktypes.KeyDAOOption(sdkstore.NewFileDAO(config.KeyPath)),
-		sdktypes.FeeOption(fees),
-		sdktypes.GasOption(config.DefaultGas),
-		sdktypes.TimeoutOption(config.Timeout),
+	fees, _ := sdk.ParseDecCoins(config.DefaultFee)
+	options := []sdk.Option{
+		sdk.CachedOption(true),
+		sdk.KeyDAOOption(storetypes.NewMemory(nil)),
+		sdk.FeeOption(fees),
+		sdk.GasOption(config.DefaultGas),
+		sdk.TimeoutOption(config.Timeout),
 	}
 
-	clientConfig, err := sdktypes.NewClientConfig(rpcAddr, grpcAddr, config.BaseConfig.ChainId, options...)
+	clientConfig, err := sdk.NewClientConfig(rpcAddr, grpcAddr, config.BaseConfig.ChainId, options...)
 
 	if err != nil {
 		common.Logger.Errorf("failed to get the sdk clientConfig: %s", err)
 		return fmt.Errorf("failed to get the sdk clientConfig: %s", err)
 	}
 
-	opbClient := sdk.NewIRITAClient(clientConfig)
+	opbClient := iservice.NewServiceClient(clientConfig)
 	f.OpbClient = opbClient
 	return nil
 }
@@ -86,8 +86,8 @@ func (opb *OpbChain) WaitForSuccess(txHash string, name string) error {
 	common.Logger.Infof("%s: transaction sent to %s, hash: %s", name, opb.BaseConfig.ChainId, txHash)
 
 	tx, _ := opb.OpbClient.QueryTx(txHash)
-	if tx.Result.Code != 0 {
-		return fmt.Errorf("transaction %s execution failed: %s", txHash, tx.Result.Log)
+	if tx.TxResult.Code != 0 {
+		return fmt.Errorf("transaction %s execution failed: %s", txHash, tx.TxResult.Log)
 	}
 
 	common.Logger.Infof("%s: transaction %s execution succeeded", name, txHash)
