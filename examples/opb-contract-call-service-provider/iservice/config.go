@@ -29,6 +29,7 @@ const (
 	NodeRPCAddr  = "node_rpc_addr"
 	NodeGRPCAddr = "node_grpc_addr"
 	AccountKey   = "account"
+	Fee          = "fee"
 	KeyPath      = "key_path"
 	KeyName      = "key_name"
 	Passphrase   = "passphrase"
@@ -42,6 +43,8 @@ type Config struct {
 
 	NodesMap map[string]string `yaml:"nodes"`
 	Account  Account           `yaml:"account"`
+
+	Fee string `yaml:"fee"`
 }
 
 type Account struct {
@@ -62,5 +65,6 @@ func NewConfig(v *viper.Viper) Config {
 		NodeRPCAddr:  v.GetString(common.GetConfigKey(Prefix, NodeRPCAddr)),
 		NodeGRPCAddr: v.GetString(common.GetConfigKey(Prefix, NodeGRPCAddr)),
 		Account:      account,
+		Fee:          v.GetString(common.GetConfigKey(Prefix, Fee)),
 	}
 }
