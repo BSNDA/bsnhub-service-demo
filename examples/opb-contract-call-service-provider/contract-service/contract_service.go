@@ -147,8 +147,9 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		callbackWrapper := func(reqCtxID, reqID, responses string) {
 			resp := types.ResponseAdaptor{
 				StatusCode: 200,
-				Result:     result,
-				Output:     responses,
+				// todo result is missing in sdk
+				//Result:     result,
+				Output: responses,
 			}
 			callResultbyte, _ := json.Marshal(resp)
 			callResult = string(callResultbyte)
@@ -232,7 +233,7 @@ func (cs ContractService) Callback(reqCtxID, reqID, input string) (output string
 		for _, e := range resultTx.TxResult.Events {
 			if e.Type == "wasm" && len(e.Attributes) > 1 {
 				for _, attr := range e.Attributes {
-					if string(attr.Key) == "contract_address" && string(attr.Value) == request.Dest.EndpointAddress {
+					if string(attr.Key) == "_contract_address" && string(attr.Value) == request.Dest.EndpointAddress {
 						for _, attr = range e.Attributes {
 							if string(attr.Key) == "result" {
 								callResult = string(attr.Value)

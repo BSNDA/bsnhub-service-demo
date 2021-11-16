@@ -12,7 +12,7 @@ iservice:
     key_name: node0
     passphrase: 12345678
     key_armor: "-----BEGIN TENDERMINT PRIVATE KEY-----\nkdf: bcrypt\nsalt: E82064503E284EE753B13E9424B08B4C\ntype: sm2\n\nqLgix+DPFfNY+TpWWlNmquy3jUDR314/dJmIxw8JCWGiSn4deFtp8IWGH/mnVe6S\nNdGt6OJ2SbwO098fk16Gw6RO+MgVjShVMXbkggc=\n=h7AT\n-----END TENDERMINT PRIVATE KEY-----"
-  fee: 0point
+  fee: 40000upoint
 
 service:
   service_name: cc-contract-call
