@@ -118,6 +118,7 @@ func NewServiceClientWrapper(
 	keyName string,
 	passphrase string,
 	keyArmor string,
+	feeString string,
 ) ServiceClientWrapper {
 	if len(chainID) == 0 {
 		chainID = defaultChainID
@@ -135,7 +136,10 @@ func NewServiceClientWrapper(
 		panic("account miss: key_name or passphrase or KeyArmor is missing")
 	}
 
-	fee, err := sdk.ParseDecCoins(defaultFee)
+	if len(feeString) == 0 {
+		feeString = defaultFee
+	}
+	fee, err := sdk.ParseDecCoins(feeString)
 	if err != nil {
 		panic(err)
 	}
@@ -180,6 +184,7 @@ func MakeServiceClientWrapper(config Config) ServiceClientWrapper {
 		config.Account.KeyName,
 		config.Account.Passphrase,
 		config.Account.KeyArmor,
+		config.Fee,
 	)
 }
 
